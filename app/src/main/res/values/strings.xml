@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Ghost Guard</string>
+    <string name="ghost_guard">GHOST GUARD</string>
+    <string name="settings">Settings</string>
+</resources>
