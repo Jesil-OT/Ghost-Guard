@@ -21,7 +21,7 @@ import com.jesil.ghostguard.ui.theme.primary
 @Composable
 fun GlassmorphismCard(
     modifier: Modifier = Modifier,
-    size: Dp = 20.dp,
+    size: Dp = 25.dp,
     padding: Dp = 24.dp,
     isFlipped: Boolean = false,
     content: @Composable RowScope.() -> Unit
@@ -29,7 +29,7 @@ fun GlassmorphismCard(
     val glassBrush = Brush.linearGradient(
         colors = listOf(
             Color.White.copy(alpha = 0.25f),
-            Color.White.copy(alpha = 0.1f)
+            Color.White.copy(alpha = 0.25f)
         )
     )
 
@@ -48,12 +48,7 @@ fun GlassmorphismCard(
             .background(background)
             .border(
                 width = 1.dp,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.4f),
-                        Color.White.copy(alpha = 0.1f)
-                    )
-                ),
+                brush = background,
                 shape = RoundedCornerShape(size)
             ),
         colors = CardDefaults.cardColors(
