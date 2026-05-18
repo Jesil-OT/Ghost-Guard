@@ -3,6 +3,8 @@ package com.jesil.ghostguard.home.presentation
 import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -37,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.service.GhostGuardService
 import com.jesil.ghostguard.home.presentation.components.FeatureCard
@@ -45,27 +48,31 @@ import com.jesil.ghostguard.ui.theme.background
 import com.jesil.ghostguard.ui.theme.primary
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+const val TAG = "HomeScreen"
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun HomeScreen() {
-    var pocketModeToggle by remember { mutableStateOf(false) }
     val viewModel: HomeViewModel = hiltViewModel()
-    val context = LocalContext.current
+    val isMotionDetectionArmed by viewModel.isMotionDetectionArmed.collectAsStateWithLifecycle()
+    val pocketModeArmed by viewModel.isPocketModeEnabled.collectAsStateWithLifecycle()
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // Now you can start the service
-            val intent = Intent(context.applicationContext, GhostGuardService::class.java)
-            context.applicationContext.startForegroundService(intent)
+            Log.d(TAG, "HomeScreen: Permission to show notification from 13+ is granted")
         }
     }
 
-    // Trigger this before starting the service
     LaunchedEffect( Unit) {
-        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            Log.d(TAG, "HomeScreen: Permission to show notification from 13+ is not needed")
+        }
     }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +90,9 @@ fun HomeScreen() {
                 },
                 title = {
                     Text(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
                         text = stringResource(R.string.ghost_guard),
                         style = Typographys.bodyLarge.copy(
                             color = primary,
@@ -114,7 +123,7 @@ fun HomeScreen() {
                     FeatureCard(
                         modifier = Modifier.padding(horizontal = 25.dp),
                         title = "Motion Detection",
-                        description = if (viewModel.toggleMotionDetectionState) "Scanning 5m radius" else "Detection inactive",
+                        description = if (isMotionDetectionArmed) "Scanning 5m radius" else "Detection inactive",
                         icon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.outline_sensors),
@@ -122,17 +131,16 @@ fun HomeScreen() {
                                 contentDescription = null
                             )
                         },
-                        isToggled = viewModel.toggleMotionDetectionState,
+                        isToggled = isMotionDetectionArmed,
                         onToggle = {
-//                            motionToggle = !motionToggle
-                            viewModel.onAction(HomeActions.ToggleMotionDetection(!viewModel.toggleMotionDetectionState))
+                            viewModel.onAction(HomeActions.ToggleMotionDetection(!isMotionDetectionArmed))
                         }
                     )
                     Spacer(Modifier.height(20.dp))
                     FeatureCard(
                         modifier = Modifier.padding(horizontal = 25.dp),
                         title = "Pocket Mode",
-                        description = if (pocketModeToggle) "active" else "inactive",
+                        description = if (pocketModeArmed) "active" else "inactive",
                         icon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.round_smartphone),
@@ -140,9 +148,9 @@ fun HomeScreen() {
                                 contentDescription = null
                             )
                         },
-                        isToggled = pocketModeToggle,
+                        isToggled = pocketModeArmed,
                         onToggle = {
-                            pocketModeToggle = !pocketModeToggle
+                            viewModel.onAction(HomeActions.TogglePocketMode(!pocketModeArmed))
                         }
                     )
                 }
@@ -150,3 +158,4 @@ fun HomeScreen() {
         }
     )
 }
+

@@ -13,8 +13,7 @@ import androidx.core.app.NotificationCompat
 
 object NotificationHelper {
     private const val CHANNEL_ID = "ghost_guard_channel"
-    private const val CHANNEL_NAME = "Ghost Guard Service"
-    private const val NOTIFICATION_ID = 1
+    private const val CHANNEL_NAME = "Ghost Guard Service Notifications"
 
     fun createNotification(context: Context): Notification {
         // 1. Create the channel first (only needs to happen once)
