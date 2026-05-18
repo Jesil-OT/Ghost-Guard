@@ -130,7 +130,7 @@ private fun FeatureCardPrev() {
                 contentDescription = null
             )
         },
-        isToggled = true,
+        isToggled = false,
         onToggle = {}
     )
 }

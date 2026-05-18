@@ -2,6 +2,7 @@ package com.jesil.ghostguard.home.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -29,7 +31,7 @@ fun GlassmorphismCard(
     val glassBrush = Brush.linearGradient(
         colors = listOf(
             Color.White.copy(alpha = 0.25f),
-            Color.White.copy(alpha = 0.25f)
+            Color.White.copy(alpha = 0.15f)
         )
     )
 
@@ -42,7 +44,7 @@ fun GlassmorphismCard(
 
     val background = if (isFlipped) glassBrush2 else glassBrush
 
-    Card(
+    Box(
         modifier = modifier
             .clip(RoundedCornerShape(size))
             .background(background)
@@ -50,20 +52,20 @@ fun GlassmorphismCard(
                 width = 1.dp,
                 brush = background,
                 shape = RoundedCornerShape(size)
+            )
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(size),
+                ambientColor = Color.Transparent,
+                spotColor = Color.Transparent
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp,
-            focusedElevation = 10.dp,
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(padding),
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-    }
+        content = {
+            Row(
+                modifier = Modifier.padding(padding),
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
+        }
+    )
 
 }
