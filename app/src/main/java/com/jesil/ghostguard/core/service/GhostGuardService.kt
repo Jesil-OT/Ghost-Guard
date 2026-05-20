@@ -3,20 +3,33 @@ package com.jesil.ghostguard.core.service
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
+import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class GhostGuardService: Service() {
-
     companion object{
         const val TAG = "GhostGuardService"
     }
 
+    @Inject lateinit var sensorManager: SensorManager
+    private var sensorMonitor: SensorMonitor? = null
+
     override fun onCreate() {
         super.onCreate()
-        Log.e("GhostGuard", "Service created!!!!")
+        Log.e(TAG, "Service created!!!!")
+        sensorMonitor = SensorMonitor {
+            Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
+            Toast.makeText(this, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -30,6 +43,10 @@ class GhostGuardService: Service() {
     }
 
     override fun onDestroy() {
+        sensorMonitor?.let {
+            it.resetMonitor()
+            sensorManager.unregisterListener(it)
+        }
         super.onDestroy()
     }
 
@@ -47,5 +64,14 @@ class GhostGuardService: Service() {
             startForeground(1, notification)
         }
         Log.e(TAG, "Motion Detection Notification!!!")
+
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        if (accelerometer != null && sensorMonitor != null) {
+            sensorManager.registerListener(
+                sensorMonitor,
+                accelerometer,
+                SensorManager.SENSOR_DELAY_GAME
+            )
+        }
     }
 }
