@@ -23,10 +23,16 @@
             android:theme="@style/Theme.GhostGuard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".warning.WarningActivity"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:showForAllUsers="true"
+            android:showWhenLocked="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

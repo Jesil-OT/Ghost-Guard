@@ -1,4 +1,4 @@
-package com.jesil.ghostguard.ui.theme
+package com.jesil.ghostguard.core.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -17,5 +17,4 @@ val primary = Color(0xF000F0FF)
 val secondary = Color(0xFFFF8A00)
 
 val tertiary = Color(0xFFFED639)
-
 val neutral = Color(0xFF707979)

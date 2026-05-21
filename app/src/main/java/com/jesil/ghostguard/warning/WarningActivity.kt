@@ -1,22 +1,18 @@
-package com.jesil.ghostguard
+package com.jesil.ghostguard.warning
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.jesil.ghostguard.home.presentation.HomeScreen
-import com.jesil.ghostguard.core.theme.GhostGuardTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class WarningActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            GhostGuardTheme {
-                HomeScreen()
-            }
+
         }
     }
 }
