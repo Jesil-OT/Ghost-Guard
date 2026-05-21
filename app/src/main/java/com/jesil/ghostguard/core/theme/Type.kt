@@ -1,4 +1,4 @@
-package com.jesil.ghostguard.ui.theme
+package com.jesil.ghostguard.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
