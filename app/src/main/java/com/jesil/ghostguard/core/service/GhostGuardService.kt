@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
+import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class GhostGuardService: Service() {
         sensorMonitor = SensorMonitor {
             Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
             Toast.makeText(this, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8", Toast.LENGTH_SHORT).show()
+            launchWarningMode()
         }
     }
 
@@ -73,5 +75,13 @@ class GhostGuardService: Service() {
                 SensorManager.SENSOR_DELAY_GAME
             )
         }
+    }
+
+    private fun launchWarningMode(){
+        val intent = Intent(this, WarningActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(intent)
+
     }
 }
