@@ -1,5 +1,6 @@
 package com.jesil.ghostguard.warning.presentation
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +43,10 @@ import com.jesil.ghostguard.warning.presentation.components.CountDownTimer
 import java.util.Locale
 
 @Composable
-fun WarningScreen() {
+fun WarningScreen(
+    countDownTimer: String,
+    onAuthenticate: () -> Unit,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -83,9 +87,9 @@ fun WarningScreen() {
                 )
             )
             CountDownTimer(
-                modifier = Modifier.padding(vertical = 15.dp)
+                modifier = Modifier.animateContentSize().padding(vertical = 15.dp)
                     .weight(1f),
-                time = "9"
+                time = countDownTimer
             )
             Text(
                 text = "Identify yourself or alarm will sound and authorities will be notified.",
@@ -101,7 +105,7 @@ fun WarningScreen() {
                     .height(60.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 25.dp),
-                onClick = { /*TODO*/ },
+                onClick = onAuthenticate,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = secondary,
                 )
@@ -120,18 +124,7 @@ fun WarningScreen() {
                     )
                 )
             }
-            Spacer(Modifier.height(30.dp))
-            Text(
-                modifier = Modifier.padding(bottom = 80.dp).clickable{
-                    //TODO("Navigate back report false alarm screen")
-                },
-                text = "Report False Alarm",
-                style = Typographys.bodyMedium.copy(
-                    color = Color.White.copy(.5f),
-                    textAlign = TextAlign.Center,
-                    textDecoration = TextDecoration.Underline
-                )
-            )
+            Spacer(Modifier.height(80.dp))
         }
     )
 }
@@ -139,5 +132,8 @@ fun WarningScreen() {
 @Preview
 @Composable
 private fun WarningScreenPreview() {
-    WarningScreen()
+    WarningScreen(
+        countDownTimer = "9",
+        onAuthenticate = {},
+    )
 }
