@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
+import com.jesil.ghostguard.core.utils.SoundManager
 import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class GhostGuardService: Service() {
     }
 
     @Inject lateinit var sensorManager: SensorManager
+    @Inject lateinit var soundManager: SoundManager
     private var sensorMonitor: SensorMonitor? = null
 
     override fun onCreate() {
@@ -29,7 +31,6 @@ class GhostGuardService: Service() {
         Log.e(TAG, "Service created!!!!")
         sensorMonitor = SensorMonitor {
             Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
-            Toast.makeText(this, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8", Toast.LENGTH_SHORT).show()
             launchWarningMode()
         }
     }
@@ -39,6 +40,8 @@ class GhostGuardService: Service() {
             ServiceActions.START_MOTION_DETECTION.toString() -> startMotionDetection()
             ServiceActions.START_POCKET_MODE.toString() -> {}
             ServiceActions.STOP.toString() -> stopSelf()
+            ServiceActions.START_SOUND.toString() -> soundManager.startSound()
+            ServiceActions.STOP_SOUND.toString() -> soundManager.stopSound()
         }
 
         return START_STICKY
@@ -49,6 +52,7 @@ class GhostGuardService: Service() {
             it.resetMonitor()
             sensorManager.unregisterListener(it)
         }
+        soundManager.stopSound()
         super.onDestroy()
     }
 
@@ -76,7 +80,6 @@ class GhostGuardService: Service() {
             )
         }
     }
-
     private fun launchWarningMode(){
         val intent = Intent(this, WarningActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP

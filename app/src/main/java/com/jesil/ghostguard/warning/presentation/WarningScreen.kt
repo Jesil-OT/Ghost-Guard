@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,94 +40,101 @@ import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
 import com.jesil.ghostguard.core.theme.secondary
 import com.jesil.ghostguard.core.theme.tertiary
+import com.jesil.ghostguard.warning.presentation.components.AlertBox
 import com.jesil.ghostguard.warning.presentation.components.CountDownTimer
 import java.util.Locale
 
 @Composable
 fun WarningScreen(
+    modifier: Modifier = Modifier,
     countDownTimer: String,
+    isTimerOver: Boolean = false,
     onAuthenticate: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(secondary.copy(alpha = .3f), background),
-                    startY = 0.0f,
-                    endY = 1000.0f
-                ),
-            ),
-        content = {
-            Row(
-                modifier = Modifier.padding(vertical = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(
-                    imageVector = Icons.Outlined.Warning,
-                    contentDescription = "Warning Senty Alert",
-                    tint = secondary
-                )
-                Text(
-                    text = "Sentry Alert".uppercase(Locale.ROOT),
-                    style = Typographys.bodyMedium.copy(
-                        color = secondary
-                    )
-                )
-            }
-            Text(
-                modifier = Modifier.padding(horizontal = 50.dp),
-                text = "Unauthorized Access Detected".uppercase(Locale.ROOT),
-                style = Typographys.bodyLarge.copy(
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 4.sp,
-                    lineHeight = 35.sp
-                )
-            )
-            CountDownTimer(
-                modifier = Modifier.animateContentSize().padding(vertical = 15.dp)
-                    .weight(1f),
-                time = countDownTimer
-            )
-            Text(
-                text = "Identify yourself or alarm will sound and authorities will be notified.",
-                style = Typographys.bodyMedium.copy(
-                    color = Color.White.copy(.5f),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 1.sp
-                )
-            )
-            Spacer(Modifier.height(30.dp))
-            Button(
-                modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = 25.dp),
-                onClick = onAuthenticate,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = secondary,
-                )
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 10.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.outline_fingerprint),
-                    contentDescription = null,
-                    tint = Color.Black.copy(alpha = .7f)
-                )
-                Text(
-                    text = "Authenticate",
-                    style = Typographys.bodyMedium.copy(
-                        color = Color.Black.copy(alpha = .7f),
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-            Spacer(Modifier.height(80.dp))
+    Box{
+        if (isTimerOver){
+            AlertBox(modifier = Modifier.fillMaxSize())
         }
-    )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(secondary.copy(alpha = .3f), background),
+                        startY = 0.0f,
+                        endY = 1000.0f
+                    )
+                ),
+            content = {
+                Row(
+                    modifier = Modifier.padding(vertical = 15.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Icon(
+                        imageVector = Icons.Outlined.Warning,
+                        contentDescription = "Warning Senty Alert",
+                        tint = secondary
+                    )
+                    Text(
+                        text = "Sentry Alert".uppercase(Locale.ROOT),
+                        style = Typographys.bodyMedium.copy(
+                            color = secondary
+                        )
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(horizontal = 50.dp),
+                    text = "Unauthorized Access Detected".uppercase(Locale.ROOT),
+                    style = Typographys.bodyLarge.copy(
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 4.sp,
+                        lineHeight = 35.sp
+                    )
+                )
+                CountDownTimer(
+                    modifier = Modifier.padding(vertical = 15.dp)
+                        .weight(1f),
+                    time = countDownTimer
+                )
+                Text(
+                    text = "Identify yourself or alarm will sound and authorities will be notified.",
+                    style = Typographys.bodyMedium.copy(
+                        color = Color.White.copy(.5f),
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 1.sp
+                    )
+                )
+                Spacer(Modifier.height(30.dp))
+                Button(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 25.dp),
+                    onClick = onAuthenticate,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = secondary,
+                    )
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(end = 10.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.outline_fingerprint),
+                        contentDescription = null,
+                        tint = Color.Black.copy(alpha = .7f)
+                    )
+                    Text(
+                        text = "Authenticate",
+                        style = Typographys.bodyMedium.copy(
+                            color = Color.Black.copy(alpha = .7f),
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+                Spacer(Modifier.height(80.dp))
+            }
+        )
+    }
 }
 
 @Preview
