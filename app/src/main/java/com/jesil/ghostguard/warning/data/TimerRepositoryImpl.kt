@@ -17,17 +17,21 @@ class TimerRepositoryImpl : TimerRepository {
 
     override val countDownFlow: MutableStateFlow<Long> = MutableStateFlow(0L)
 
-    private val isFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
+//    private val isFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    override val isTimerFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun startTimer()  {
         cancelTimer()
-        isFinished.value = false
+//        isFinished.value = false
+        timerFinished(false)
         timerJob = scope.launch {
             for (i in 10 downTo 0) {
                 countDownFlow.value = i.toLong()
                 delay(1000)
             }
-            isFinished.value = true
+//            isFinished.value = true
+            timerFinished(true)
         }
     }
     override fun cancelTimer() {
@@ -35,5 +39,9 @@ class TimerRepositoryImpl : TimerRepository {
         timerJob = null
     }
 
-    override fun timerFinished(): Boolean = isFinished.value
+//    override fun timerFinished(): Boolean = isFinished.value
+
+    override fun timerFinished(value: Boolean) {
+        isTimerFinished.value = value
+    }
 }

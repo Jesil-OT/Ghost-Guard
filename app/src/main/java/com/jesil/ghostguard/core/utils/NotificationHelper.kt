@@ -1,6 +1,6 @@
 package com.jesil.ghostguard.core.utils
 
-import com.jesil.ghostguard.MainActivity
+import com.jesil.ghostguard.core.MainActivity
 import com.jesil.ghostguard.R
 import android.app.Notification
 import android.app.NotificationChannel
