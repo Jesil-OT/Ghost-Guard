@@ -57,14 +57,7 @@ fun WarningScreen(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(secondary.copy(alpha = .3f), background),
-                        startY = 0.0f,
-                        endY = 1000.0f
-                    )
-                ),
+            modifier = modifier.fillMaxSize(),
             content = {
                 Row(
                     modifier = Modifier.padding(vertical = 15.dp),
@@ -141,6 +134,14 @@ fun WarningScreen(
 @Composable
 private fun WarningScreenPreview() {
     WarningScreen(
+        modifier = Modifier
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(secondary.copy(alpha = .3f), background),
+                    startY = 0.0f,
+                    endY = 1000.0f
+                )
+            ),
         countDownTimer = "9",
         onAuthenticate = {},
     )

@@ -58,7 +58,13 @@ class WarningActivity : FragmentActivity() {
             Scaffold(
                 content = { innerPadding ->
                     WarningScreen(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier.background(
+                            Brush.verticalGradient(
+                                colors = listOf(secondary.copy(alpha = .3f), background),
+                                startY = 0.0f,
+                                endY = 1000.0f
+                            )
+                        ).padding(innerPadding),
                         countDownTimer = timerValue.toString(),
                         isTimerOver = isTimeOver,
                         onAuthenticate = {
@@ -72,10 +78,7 @@ class WarningActivity : FragmentActivity() {
                                     viewModel.launchSoundIntent(actions = ServiceActions.STOP_SOUND.toString())
                                     finish()
                                 },
-                                onAuthenticationError = { _, _ ->
-                                    viewModel.cancelTimer()
-                                    viewModel.startTimer()
-                                }
+                                onAuthenticationError = { _, _ -> }
                             )
                         },
                     )

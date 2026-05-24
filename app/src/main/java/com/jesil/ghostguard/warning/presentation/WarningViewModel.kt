@@ -5,11 +5,13 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.jesil.ghostguard.core.service.GhostGuardService
 import com.jesil.ghostguard.core.service.ServiceActions
 import com.jesil.ghostguard.warning.domain.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val TAG = "WarningViewModel"
@@ -23,7 +25,18 @@ class WarningViewModel @Inject constructor(
 
     init {
         startTimer()
-        isTimerDone()
+        observeTimerCompletion()
+    }
+
+    private fun observeTimerCompletion(){
+        viewModelScope.launch {
+            timerRepository.isTimerFinished.collect{ timerDone ->
+                if (timerDone){
+                    Log.d(TAG, "isTimerDone: If not authenticated, play alert sound and notify authorities")
+                    launchSoundIntent(actions = ServiceActions.START_SOUND.toString())
+                }
+            }
+        }
     }
 
     fun startTimer(){
@@ -32,15 +45,6 @@ class WarningViewModel @Inject constructor(
 
     fun cancelTimer(){
         timerRepository.cancelTimer()
-    }
-
-    fun isTimerDone(){
-        if (timerRepository.isTimerFinished.value){
-            Log.d(TAG, "isTimerDone: If not authenticated, play alert sound and notify authorities")
-            Toast.makeText(application, "Play sound and triggerAlert value is ${triggerAlert.value} ", Toast.LENGTH_LONG).show()
-//            triggerAlert.value = true
-            launchSoundIntent(actions = ServiceActions.START_SOUND.toString())
-        }
     }
 
     fun launchSoundIntent(actions: String){

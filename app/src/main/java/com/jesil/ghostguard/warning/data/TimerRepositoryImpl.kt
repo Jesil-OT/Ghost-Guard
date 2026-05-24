@@ -16,21 +16,16 @@ class TimerRepositoryImpl : TimerRepository {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override val countDownFlow: MutableStateFlow<Long> = MutableStateFlow(0L)
-
-//    private val isFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
     override val isTimerFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun startTimer()  {
         cancelTimer()
-//        isFinished.value = false
         timerFinished(false)
         timerJob = scope.launch {
             for (i in 10 downTo 0) {
                 countDownFlow.value = i.toLong()
                 delay(1000)
             }
-//            isFinished.value = true
             timerFinished(true)
         }
     }
@@ -38,8 +33,6 @@ class TimerRepositoryImpl : TimerRepository {
         timerJob?.cancel()
         timerJob = null
     }
-
-//    override fun timerFinished(): Boolean = isFinished.value
 
     override fun timerFinished(value: Boolean) {
         isTimerFinished.value = value
