@@ -9,11 +9,17 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import com.jesil.ghostguard.core.data.SecurityRepository
+import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
 import com.jesil.ghostguard.core.utils.SoundManager
 import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -21,17 +27,41 @@ class GhostGuardService: Service() {
     companion object{
         const val TAG = "GhostGuardService"
     }
-
     @Inject lateinit var sensorManager: SensorManager
     @Inject lateinit var soundManager: SoundManager
     private var sensorMonitor: SensorMonitor? = null
+
+    @Inject lateinit var securityRepository: SecurityRepository
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
         Log.e(TAG, "Service created!!!!")
         sensorMonitor = SensorMonitor {
             Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
-            launchWarningMode()
+           securityRepository.updateState(SecurityState.WARNING)
+        }
+
+        serviceScope.launch {
+            securityRepository.securityState.collect { state ->
+                when (state) {
+                    SecurityState.IDLE -> {
+                        Log.e(TAG, "Security State: IDLE")
+                        soundManager.stopSound()
+                    }
+                    SecurityState.ARMED -> {
+                        Log.e(TAG, "Security State: ARMED")
+                    }
+                    SecurityState.WARNING -> {
+                        Log.e(TAG, "Security State: WARNING")
+                        launchWarningMode()
+                    }
+                    SecurityState.ALARM -> {
+                        Log.e(TAG, "Security State: ALARM")
+                        soundManager.startSound()
+                    }
+                }
+            }
         }
     }
 
@@ -40,19 +70,23 @@ class GhostGuardService: Service() {
             ServiceActions.START_MOTION_DETECTION.toString() -> startMotionDetection()
             ServiceActions.START_POCKET_MODE.toString() -> {}
             ServiceActions.STOP.toString() -> stopSelf()
-            ServiceActions.START_SOUND.toString() -> soundManager.startSound()
-            ServiceActions.STOP_SOUND.toString() -> soundManager.stopSound()
+            ServiceActions.START_SOUND.toString() -> {
+//                soundManager.startSound()
+                securityRepository.updateState(SecurityState.ALARM)
+            }
+            ServiceActions.STOP_SOUND.toString() -> {
+//                soundManager.stopSound()
+                securityRepository.updateState(SecurityState.IDLE)
+            }
         }
 
         return START_STICKY
     }
 
     override fun onDestroy() {
-        sensorMonitor?.let {
-            it.resetMonitor()
-            sensorManager.unregisterListener(it)
-        }
-        soundManager.stopSound()
+        stopAllSensors()
+//        soundManager.stopSound()
+        securityRepository.updateState(SecurityState.IDLE)
         super.onDestroy()
     }
 
@@ -79,12 +113,19 @@ class GhostGuardService: Service() {
                 SensorManager.SENSOR_DELAY_GAME
             )
         }
+        securityRepository.updateState(SecurityState.ARMED)
     }
     private fun launchWarningMode(){
         val intent = Intent(this, WarningActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         startActivity(intent)
+    }
 
+    private fun stopAllSensors(){
+        sensorMonitor?.let {
+            it.resetMonitor()
+            sensorManager.unregisterListener(it)
+        }
     }
 }
