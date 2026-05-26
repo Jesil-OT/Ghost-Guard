@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jesil.ghostguard.core.data.SecurityRepository
+import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.service.ServiceActions
 import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.secondary
@@ -31,7 +34,6 @@ const val TAG = "WarningActivity"
 class WarningActivity : FragmentActivity() {
     @Inject
     lateinit var keyguardManager: KeyguardManager
-
     val biometricPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
