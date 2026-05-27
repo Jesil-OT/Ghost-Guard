@@ -24,6 +24,7 @@ fun GlassmorphismCard(
     size: Dp = 25.dp,
     padding: Dp = 24.dp,
     isFlipped: Boolean = false,
+    enabled: Boolean = true,
     content: @Composable RowScope.() -> Unit
 ) {
     val glassBrush = Brush.linearGradient(
@@ -40,7 +41,15 @@ fun GlassmorphismCard(
         )
     )
 
-    val background = if (isFlipped) glassBrush2 else glassBrush
+    val glassBrush3 = Brush.linearGradient(
+        colors = listOf(
+            Color.DarkGray.copy(alpha = 0.15f),
+            Color.DarkGray.copy(alpha = 0.05f)
+        )
+    )
+
+    val backgroundIfFlipped = if (isFlipped) glassBrush2 else glassBrush
+    val background = if (enabled) backgroundIfFlipped else glassBrush3
 
     Box(
         modifier = modifier

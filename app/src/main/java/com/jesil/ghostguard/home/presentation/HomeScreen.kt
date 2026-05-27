@@ -6,6 +6,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -116,7 +118,7 @@ fun HomeScreen() {
                     FeatureCard(
                         modifier = Modifier.padding(horizontal = 25.dp),
                         title = "Motion Detection",
-                        description = if (isMotionDetectionArmed) "Scanning 5m radius" else "Detection inactive",
+                        description = if (isMotionDetectionArmed) "Armed" else "Detection inactive",
                         icon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.outline_sensors),
@@ -133,11 +135,15 @@ fun HomeScreen() {
                     FeatureCard(
                         modifier = Modifier.padding(horizontal = 25.dp),
                         title = "Pocket Mode",
+                        enabled = isMotionDetectionArmed,
                         description = if (pocketModeArmed) "active" else "inactive",
                         icon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.round_smartphone),
-                                tint = primary,
+                                tint = animateColorAsState(
+                                    targetValue = if (isMotionDetectionArmed) primary else Color.Black,
+                                    label = "icon_enable_color"
+                                ).value,
                                 contentDescription = null
                             )
                         },
