@@ -48,9 +48,10 @@ class GhostGuardService: Service() {
             securityRepository.securityState.collect { state ->
                 when (state) {
                     SecurityState.IDLE, SecurityState.ARMED-> {
-                        if (state == SecurityState.IDLE) soundManager.stopSound()
+                       soundManager.stopSound()
                     }
                     SecurityState.WARNING -> {
+                        soundManager.stopSound()
                         launchWarningMode()
                         startWatchdog()
                     }
@@ -65,8 +66,8 @@ class GhostGuardService: Service() {
             ServiceActions.START_MOTION_DETECTION.toString() -> startMotionDetection()
             ServiceActions.START_POCKET_MODE.toString() -> {}
             ServiceActions.STOP.toString() -> {
+                soundManager.stopSound()
                 stopSelf()
-                securityRepository.updateState(SecurityState.IDLE)
             }
             ServiceActions.START_SOUND.toString() -> securityRepository.updateState(SecurityState.ALARM)
             ServiceActions.STOP_SOUND.toString() -> securityRepository.updateState(SecurityState.IDLE)
@@ -126,9 +127,9 @@ class GhostGuardService: Service() {
         }
     }
     private fun launchWarningMode(){
-        val notification = NotificationHelper.createWarningNotification(this)
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(1, notification)
+//        val notification = NotificationHelper.createWarningNotification(this)
+//        val notificationManager = getSystemService(NotificationManager::class.java)
+//        notificationManager.notify(1, notification)
 
         if (Settings.canDrawOverlays(this)) {
             val intent = Intent(this, WarningActivity::class.java).apply {
