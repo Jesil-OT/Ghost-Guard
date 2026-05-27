@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.jesil.ghostguard.warning.WarningActivity
 
 object NotificationHelper {
     private const val CHANNEL_ID = "ghost_guard_channel"
@@ -25,10 +26,8 @@ object NotificationHelper {
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
+            context, 0,
+            intent, PendingIntent.FLAG_IMMUTABLE
         )
 
         // 3. Build the actual notification
@@ -37,8 +36,29 @@ object NotificationHelper {
             .setContentText("Monitoring sensors for movement...")
             .setSmallIcon(R.drawable.outline_security)
             .setOngoing(true) // Makes it harder for the user to swipe away
-            .setPriority(NotificationCompat.PRIORITY_LOW) // Use LOW to avoid annoying pops
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntent)
+            .build()
+    }
+
+    fun createWarningNotification(context: Context): Notification {
+        val intent = Intent(context, WarningActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context, 0,
+            intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        return NotificationCompat.Builder(context, CHANNEL_ID)
+            .setContentTitle("Security Alert")
+            .setContentText("Motion Detected!")
+            .setSmallIcon(R.drawable.outline_security)
+//            .setOngoing(true) // Makes it harder for the user to swipe away
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(pendingIntent, true)
             .build()
     }
 

@@ -17,23 +17,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.jesil.ghostguard.core.data.SecurityDataStore
 import com.jesil.ghostguard.core.data.SecurityRepository
 import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.service.ServiceActions
 import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.secondary
 import com.jesil.ghostguard.core.utils.BiometricsManager
+import com.jesil.ghostguard.core.utils.ViewUtils.disableBackPress
 import com.jesil.ghostguard.warning.presentation.WarningScreen
 import com.jesil.ghostguard.warning.presentation.WarningViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val TAG = "WarningActivity"
 
 @AndroidEntryPoint
 class WarningActivity : FragmentActivity() {
-    @Inject
-    lateinit var keyguardManager: KeyguardManager
+    @Inject lateinit var keyguardManager: KeyguardManager
+    @Inject lateinit var securityDataStore: SecurityDataStore
     val biometricPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -43,11 +47,21 @@ class WarningActivity : FragmentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch {
+            securityDataStore.setWarningActive(
+                isActive = true
+            )
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setShowWhenLocked(true)
         setTurnScreenOn(true)
+        disableBackPress()
 
         keyguardManager.requestDismissKeyguard(this, null)
 
@@ -85,6 +99,15 @@ class WarningActivity : FragmentActivity() {
                         },
                     )
                 }
+            )
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lifecycleScope.launch {
+            securityDataStore.setWarningActive(
+                isActive = false
             )
         }
     }

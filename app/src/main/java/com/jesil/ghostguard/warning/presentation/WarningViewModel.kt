@@ -6,8 +6,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.jesil.ghostguard.core.data.SecurityDataStore
+import com.jesil.ghostguard.core.data.SecurityRepository
 import com.jesil.ghostguard.core.service.GhostGuardService
 import com.jesil.ghostguard.core.service.ServiceActions
+import com.jesil.ghostguard.core.utils.Constants.ACTION_UPDATE_ACTIVITY_STATUS
 import com.jesil.ghostguard.warning.domain.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +21,7 @@ const val TAG = "WarningViewModel"
 @HiltViewModel
 class WarningViewModel @Inject constructor(
     private val application: Application,
-    private val timerRepository: TimerRepository
+    private val timerRepository: TimerRepository,
 ): AndroidViewModel(application) {
     var countDownTimerValue = timerRepository.countDownFlow
     var triggerAlert = timerRepository.isTimerFinished
@@ -54,4 +57,12 @@ class WarningViewModel @Inject constructor(
             }
         )
     }
+
+    /**
+     * This function checks to see if the warning activity
+     * has been killed accidentally by the thief or the user
+     *
+     * it sends intent when the warning activity is no longer visible on the screen
+     * and the user has not authenticated it means you are trying to use a backdoor approach
+     * so the app will launch this function when it sees that*/
 }

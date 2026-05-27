@@ -1,5 +1,6 @@
 package com.jesil.ghostguard.core.service
 
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -7,8 +8,10 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import com.jesil.ghostguard.core.data.SecurityDataStore
 import com.jesil.ghostguard.core.data.SecurityRepository
 import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.sensors.SensorMonitor
@@ -32,6 +35,7 @@ class GhostGuardService: Service() {
     private var sensorMonitor: SensorMonitor? = null
 
     @Inject lateinit var securityRepository: SecurityRepository
+    @Inject lateinit var securityDataStore: SecurityDataStore
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
@@ -45,16 +49,13 @@ class GhostGuardService: Service() {
         serviceScope.launch {
             securityRepository.securityState.collect { state ->
                 when (state) {
-                    SecurityState.IDLE -> {
-                        Log.e(TAG, "Security State: IDLE")
-                        soundManager.stopSound()
-                    }
-                    SecurityState.ARMED -> {
-                        Log.e(TAG, "Security State: ARMED")
+                    SecurityState.IDLE, SecurityState.ARMED-> {
+                        if (state == SecurityState.IDLE) soundManager.stopSound()
                     }
                     SecurityState.WARNING -> {
                         Log.e(TAG, "Security State: WARNING")
                         launchWarningMode()
+                        startWatchdog()
                     }
                     SecurityState.ALARM -> {
                         Log.e(TAG, "Security State: ALARM")
@@ -69,15 +70,13 @@ class GhostGuardService: Service() {
         when(intent?.action){
             ServiceActions.START_MOTION_DETECTION.toString() -> startMotionDetection()
             ServiceActions.START_POCKET_MODE.toString() -> {}
-            ServiceActions.STOP.toString() -> stopSelf()
-            ServiceActions.START_SOUND.toString() -> {
-//                soundManager.startSound()
-                securityRepository.updateState(SecurityState.ALARM)
-            }
-            ServiceActions.STOP_SOUND.toString() -> {
-//                soundManager.stopSound()
+            ServiceActions.STOP.toString() -> {
+                stopSelf()
                 securityRepository.updateState(SecurityState.IDLE)
             }
+            ServiceActions.START_SOUND.toString() -> securityRepository.updateState(SecurityState.ALARM)
+            ServiceActions.STOP_SOUND.toString() -> securityRepository.updateState(SecurityState.IDLE)
+
         }
 
         return START_STICKY
@@ -85,7 +84,6 @@ class GhostGuardService: Service() {
 
     override fun onDestroy() {
         stopAllSensors()
-//        soundManager.stopSound()
         securityRepository.updateState(SecurityState.IDLE)
         super.onDestroy()
     }
@@ -115,11 +113,36 @@ class GhostGuardService: Service() {
         }
         securityRepository.updateState(SecurityState.ARMED)
     }
-    private fun launchWarningMode(){
-        val intent = Intent(this, WarningActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+    private fun startWatchdog(){
+        Log.e(TAG, "called startWatchdog")
+        serviceScope.launch {
+            securityDataStore.isWarningActiveFLow.collect { isActive ->
+                val currentState = securityRepository.securityState.value
+                when {
+                    currentState == SecurityState.WARNING && !isActive -> {
+                        Log.e(TAG, "WATCHDOG: App was killed/backgrounded! in Warning Force re-launching...")
+                        launchWarningMode()
+                    }
+                    currentState == SecurityState.ALARM && !isActive -> {
+                        Log.e(TAG, "WATCHDOG: App was killed/backgrounded! in Alarmed Force re-launching...")
+                        launchWarningMode()
+                    }
+                }
+            }
         }
-        startActivity(intent)
+    }
+    private fun launchWarningMode(){
+        val notification = NotificationHelper.createWarningNotification(this)
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(1, notification)
+
+        if (Settings.canDrawOverlays(this)) {
+            val intent = Intent(this, WarningActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
+        }
     }
 
     private fun stopAllSensors(){
