@@ -33,14 +33,12 @@ class GhostGuardService: Service() {
     @Inject lateinit var sensorManager: SensorManager
     @Inject lateinit var soundManager: SoundManager
     private var sensorMonitor: SensorMonitor? = null
-
     @Inject lateinit var securityRepository: SecurityRepository
     @Inject lateinit var securityDataStore: SecurityDataStore
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
-        Log.e(TAG, "Service created!!!!")
         sensorMonitor = SensorMonitor {
             Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
            securityRepository.updateState(SecurityState.WARNING)
@@ -53,14 +51,10 @@ class GhostGuardService: Service() {
                         if (state == SecurityState.IDLE) soundManager.stopSound()
                     }
                     SecurityState.WARNING -> {
-                        Log.e(TAG, "Security State: WARNING")
                         launchWarningMode()
                         startWatchdog()
                     }
-                    SecurityState.ALARM -> {
-                        Log.e(TAG, "Security State: ALARM")
-                        soundManager.startSound()
-                    }
+                    SecurityState.ALARM -> soundManager.startSound()
                 }
             }
         }
@@ -115,7 +109,6 @@ class GhostGuardService: Service() {
     }
 
     private fun startWatchdog(){
-        Log.e(TAG, "called startWatchdog")
         serviceScope.launch {
             securityDataStore.isWarningActiveFLow.collect { isActive ->
                 val currentState = securityRepository.securityState.value
