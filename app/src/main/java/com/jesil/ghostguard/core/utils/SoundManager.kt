@@ -17,8 +17,9 @@ class SoundManager @Inject constructor(
 ) {
     private var mediaPlayer: MediaPlayer? = null
 
-
     fun startSound(){
+        if (mediaPlayer?.isPlaying == true) return
+
         audioManager.setStreamVolume(
             AudioManager.STREAM_MUSIC,
             audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
@@ -40,9 +41,16 @@ class SoundManager @Inject constructor(
     }
 
     fun stopSound(){
-        mediaPlayer?.apply {
-            if (isPlaying) stop()
-            release()
+        mediaPlayer?.let {
+            try {
+                if (it.isPlaying){
+                    it.stop()
+                }
+            } catch (e: Exception){
+                e.printStackTrace()
+            } finally {
+                it.release()
+            }
         }
         mediaPlayer = null
     }
