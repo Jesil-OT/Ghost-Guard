@@ -1,5 +1,6 @@
 package com.jesil.ghostguard.home.presentation.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,15 +36,21 @@ fun FeatureCard(
     modifier: Modifier = Modifier,
     title: String,
     description: String,
+    enabled: Boolean = true,
     isToggled: Boolean = false,
     icon: @Composable () -> Unit,
     onToggle: (Boolean) -> Unit
 ) {
+    val enabledColor = animateColorAsState(
+        targetValue = if (enabled) Color.White else Color.Black.copy(.8f),
+        label = "icon_enable_color"
+    )
     GlassmorphismCard(
         modifier = modifier.fillMaxWidth().clickable(
-            onClick = { onToggle(!isToggled) }
+            onClick = { if (enabled) onToggle(!isToggled) }
         ),
         isFlipped = isToggled,
+        enabled = enabled,
         padding = 15.dp
     ) {
         val modifier = if (isToggled) {
@@ -64,7 +71,8 @@ fun FeatureCard(
             GlassmorphismCard(
                 size = 360.dp,
                 padding = 8.dp,
-                isFlipped = isToggled
+                isFlipped = isToggled,
+                enabled = enabled
             ) { icon() }
         }
         Spacer(Modifier.width(15.dp))
@@ -74,14 +82,14 @@ fun FeatureCard(
             Text(
                 text = title,
                 style = Typographys.bodyMedium.copy(
-                    color = Color.White
+                    color = enabledColor.value
                 )
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = description,
                 style = Typographys.bodySmall.copy(
-                    color = Color.White
+                    color = enabledColor.value
                 )
             )
         }
@@ -89,6 +97,7 @@ fun FeatureCard(
             modifier = Modifier.scale(.7f),
             checked = isToggled,
             onCheckedChange = onToggle,
+            enabled = enabled,
             thumbContent = {
                 if (isToggled)
                     Icon(
@@ -101,9 +110,15 @@ fun FeatureCard(
             colors = SwitchDefaults.colors(
                 checkedThumbColor = neutral,
                 checkedTrackColor = primary,
-                uncheckedBorderColor = Color.Transparent,
+                uncheckedBorderColor = Color.White.copy(.5f),
                 uncheckedTrackColor = Color.White.copy(.4f),
-                uncheckedThumbColor = Color.Black.copy(.5f),
+                uncheckedThumbColor = Color.White.copy(.5f),
+                disabledUncheckedThumbColor = Color.Black.copy(.5f),
+                disabledUncheckedTrackColor = Color.Black.copy(.3f),
+                disabledUncheckedBorderColor = Color.Black,
+                disabledCheckedThumbColor = Color.Black.copy(.5f),
+                disabledCheckedTrackColor = Color.Black.copy(.3f),
+                disabledCheckedBorderColor = Color.Black
             )
         )
     }
