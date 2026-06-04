@@ -17,11 +17,14 @@ import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
 import com.jesil.ghostguard.core.utils.SoundManager
+import com.jesil.ghostguard.home.domain.PocketModeRepository
 import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,13 +38,24 @@ class GhostGuardService: Service() {
     private var sensorMonitor: SensorMonitor? = null
     @Inject lateinit var securityRepository: SecurityRepository
     @Inject lateinit var securityDataStore: SecurityDataStore
+    @Inject lateinit var pocketModeRepository: PocketModeRepository
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
-        sensorMonitor = SensorMonitor {
-            Log.e(TAG, "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8")
-           securityRepository.updateState(SecurityState.WARNING)
+        sensorMonitor = SensorMonitor{
+            Log.e(
+                TAG,
+                "Motion Detected!!!!, \uD83D\uDEA8 VALID SECURITY EVENT TRIGGERED! \uD83D\uDEA8"
+            )
+            securityRepository.updateState(SecurityState.WARNING)
+        }
+
+        serviceScope.launch {
+            pocketModeRepository.isPocketModeEnabled.collect { isEnabled ->
+                Log.e(TAG, "onCreate: Pocket Mode Enabled: $isEnabled")
+                sensorMonitor?.isPocketModeEnabled = isEnabled
+            }
         }
 
         serviceScope.launch {
@@ -64,7 +78,7 @@ class GhostGuardService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action){
             ServiceActions.START_MOTION_DETECTION.toString() -> startMotionDetection()
-            ServiceActions.START_POCKET_MODE.toString() -> {}
+            ServiceActions.START_POCKET_MODE.toString() -> startMotionDetection()
             ServiceActions.STOP.toString() -> {
                 soundManager.stopSound()
                 stopSelf()
@@ -73,13 +87,13 @@ class GhostGuardService: Service() {
             ServiceActions.STOP_SOUND.toString() -> securityRepository.updateState(SecurityState.IDLE)
 
         }
-
         return START_STICKY
     }
 
     override fun onDestroy() {
         stopAllSensors()
         securityRepository.updateState(SecurityState.IDLE)
+        serviceScope.cancel()
         super.onDestroy()
     }
 
@@ -99,11 +113,20 @@ class GhostGuardService: Service() {
         Log.e(TAG, "Motion Detection Notification!!!")
 
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
         if (accelerometer != null && sensorMonitor != null) {
             sensorManager.registerListener(
                 sensorMonitor,
                 accelerometer,
-                SensorManager.SENSOR_DELAY_GAME
+                SensorManager.SENSOR_DELAY_UI // SENSOR_DELAY_GAME
+            )
+        }
+        // Register Proximity ONLY if the device has one
+        if (proximity != null && sensorMonitor != null) {
+            sensorManager.registerListener(
+                sensorMonitor,
+                proximity,
+                SensorManager.SENSOR_DELAY_UI // Low battery impact
             )
         }
         securityRepository.updateState(SecurityState.ARMED)
@@ -127,10 +150,6 @@ class GhostGuardService: Service() {
         }
     }
     private fun launchWarningMode(){
-//        val notification = NotificationHelper.createWarningNotification(this)
-//        val notificationManager = getSystemService(NotificationManager::class.java)
-//        notificationManager.notify(1, notification)
-
         if (Settings.canDrawOverlays(this)) {
             val intent = Intent(this, WarningActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
