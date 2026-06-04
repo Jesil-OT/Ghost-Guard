@@ -92,6 +92,7 @@ fun WarningScreen(
                     time = countDownTimer
                 )
                 Text(
+                    modifier = Modifier.padding(horizontal = 25.dp),
                     text = "Identify yourself or alarm will sound and authorities will be notified.",
                     style = Typographys.bodyMedium.copy(
                         color = Color.White.copy(.5f),
