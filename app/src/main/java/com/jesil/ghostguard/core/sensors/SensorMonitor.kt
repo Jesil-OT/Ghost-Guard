@@ -10,7 +10,6 @@ import kotlin.math.sqrt
 class SensorMonitor(
     private val onMotionDetected: () -> Unit,
 ): SensorEventListener {
-    // --- Tuning Configuration Constants ---
     private val thresholdSlop = 1.8f       // Delta deviation from gravity (m/s^2)
     private val sustainedWindowMs = 350L    // Continuous time movement must endure
 
@@ -57,8 +56,6 @@ class SensorMonitor(
                                 onMotionDetected()
                                 resetMonitor() // Reset state to prevent infinite fire loops
                             }
-//                            onMotionDetected()
-//                            resetMonitor()
                         }
                     }
                 } else {
