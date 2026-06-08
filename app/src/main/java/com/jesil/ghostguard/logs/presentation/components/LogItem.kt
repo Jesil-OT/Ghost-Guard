@@ -33,8 +33,8 @@ fun LogItem(
     isAlert: Boolean = logModel.type == LogEventType.ALARM_TRIGGERED || logModel.type == LogEventType.WARNING_TRIGGERED,
     isArmed: Boolean = logModel.type == LogEventType.SYSTEM_ARMED  || logModel.type == LogEventType.POCKET_MODE_ARMED
 ) {
-    val textColor = if (isAlert) Color.Red.copy(alpha = .7f) else if (isArmed) primary else Color.White
-    val timeTextColor = if (isAlert) Color.Red.copy(alpha = .5f) else Color.White
+    val textColor = if (isAlert) Color(0xFFffb4ab) else if (isArmed) primary else Color.White
+    val timeTextColor = if (isAlert) Color(0xFFffb4ab) else Color.White
     GlassmorphismCard(
         modifier = modifier.fillMaxWidth(),
         isFlipped = isArmed,
