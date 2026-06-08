@@ -3,6 +3,7 @@ package com.jesil.ghostguard.home.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -22,10 +23,11 @@ import com.jesil.ghostguard.core.theme.primary
 fun GlassmorphismCard(
     modifier: Modifier = Modifier,
     size: Dp = 25.dp,
-    padding: Dp = 24.dp,
+    padding: Dp = 10.dp,
     isFlipped: Boolean = false,
     enabled: Boolean = true,
-    content: @Composable RowScope.() -> Unit
+    isError: Boolean = false,
+    content: @Composable BoxScope.() -> Unit
 ) {
     val glassBrush = Brush.linearGradient(
         colors = listOf(
@@ -48,8 +50,15 @@ fun GlassmorphismCard(
         )
     )
 
-    val backgroundIfFlipped = if (isFlipped) glassBrush2 else glassBrush
-    val background = if (enabled) backgroundIfFlipped else glassBrush3
+    val glassBrush4 = Brush.linearGradient(
+        colors = listOf(
+            Color.Red.copy(alpha = 0.25f),
+            Color.Red.copy(alpha = 0.15f)
+        )
+    )
+
+    val background =
+        if (isFlipped) glassBrush2 else if (!enabled) glassBrush3 else if (isError) glassBrush4 else glassBrush
 
     Box(
         modifier = modifier
@@ -67,9 +76,8 @@ fun GlassmorphismCard(
                 spotColor = Color.Transparent
             ),
         content = {
-            Row(
+            Box(
                 modifier = Modifier.padding(padding),
-                verticalAlignment = Alignment.CenterVertically,
                 content = content
             )
         }
