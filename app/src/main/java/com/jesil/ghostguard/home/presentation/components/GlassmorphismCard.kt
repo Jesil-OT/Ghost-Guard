@@ -52,8 +52,8 @@ fun GlassmorphismCard(
 
     val glassBrush4 = Brush.linearGradient(
         colors = listOf(
-            Color.Red.copy(alpha = 0.25f),
-            Color.Red.copy(alpha = 0.15f)
+            Color.Red.copy(alpha = 0.15f),
+            Color.Red.copy(alpha = 0.05f)
         )
     )
 

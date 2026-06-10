@@ -1,19 +1,36 @@
 package com.jesil.ghostguard.logs.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
+import com.jesil.ghostguard.core.theme.primary
 import com.jesil.ghostguard.logs.presentation.components.LogChips
+import com.jesil.ghostguard.logs.presentation.components.LogItem
 import com.jesil.ghostguard.logs.presentation.model.LogEventType
 import com.jesil.ghostguard.logs.presentation.model.SecurityLogModel
 import com.jesil.ghostguard.logs.presentation.model.GroupedLogModel
@@ -22,22 +39,48 @@ import com.jesil.ghostguard.logs.presentation.model.title
 
 @Composable
 fun SecurityLogScreen() {
-
+    val selectedMode = remember { mutableStateOf(logModes.first()) }
+    SecurityLogScreenInnerScreen(
+        securityLogs = fakeHistory,
+        logModes = logModes,
+        onLogSelected = { selectedMode.value = it }
+    )
+    LaunchedEffect(selectedMode.value) {
+        //TODO: Filter logs based on selected mode
+        when(selectedMode.value){
+            "All Events" -> { fakeHistory }
+            "Alerts" -> {
+                fakeHistory.map { groupedLogModel ->
+                    groupedLogModel.securityLogs.filter { securityLogModel ->
+                        securityLogModel.type == LogEventType.ALARM_TRIGGERED || securityLogModel.type == LogEventType.WARNING_TRIGGERED}
+                }
+            }
+            "System" -> {
+                fakeHistory.map { groupedLogModel ->
+                    groupedLogModel.securityLogs.filter { securityLogModel ->
+                        securityLogModel.type == LogEventType.SYSTEM_ARMED || securityLogModel.type == LogEventType.POCKET_MODE_ARMED
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun SecurityLogScreenInnerScreen(
     modifier: Modifier = Modifier,
-    securityLogs: List<GroupedLogModel>
+    securityLogs: List<GroupedLogModel>,
+    logModes: List<String>,
+    onLogSelected: (String) -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(background)
-            .padding(horizontal = 20.dp, vertical = 25.dp)
+            .padding(horizontal = 20.dp)
     ) {
         Text(
-            modifier = Modifier.padding(bottom = 15.dp),
+            modifier = Modifier.padding(bottom = 15.dp, top = 25.dp),
             text = "Security Log",
             style = Typographys.bodyLarge.copy(
                 color = Color.White
@@ -52,9 +95,49 @@ fun SecurityLogScreenInnerScreen(
             )
         )
         LogChips(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(bottom = 20.dp),
             logModes = logModes,
             selectedMode = logModes.first(),
-            onSelected = {}
+            onSelected = onLogSelected
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(25.dp),
+            contentPadding = PaddingValues(bottom = 20.dp),
+            content = {
+                securityLogs.forEach { groupedLogModel ->
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .background(
+                                    Color.Black.copy(alpha = .15f),
+                                    shape = RoundedCornerShape(100.dp)
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = if (groupedLogModel.day == "Today") primary else Color.White.copy(
+                                        .5f
+                                    ),
+                                    shape = RoundedCornerShape(100.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 2.dp),
+                            text = groupedLogModel.day,
+                            style = Typographys.bodySmall.copy(
+                                color = if (groupedLogModel.day == "Today") primary else Color.White.copy(
+                                    .5f
+                                )
+                            )
+                        )
+                    }
+                    items(groupedLogModel.securityLogs) { securityLog ->
+                        LogItem(logModel = securityLog)
+                    }
+                }
+            }
         )
     }
 }
@@ -63,11 +146,13 @@ fun SecurityLogScreenInnerScreen(
 @Composable
 private fun SecurityLogScreenPreview() {
     SecurityLogScreenInnerScreen(
-        securityLogs = fakeHistory
+        securityLogs = fakeHistory,
+        logModes = logModes,
+        onLogSelected = {}
     )
 }
 
-val logModes = listOf("All Events, Alerts, System")
+val logModes = listOf("All Events", "Alerts", "System")
 
 val fakeHistory = listOf(
     GroupedLogModel(
@@ -93,6 +178,25 @@ val fakeHistory = listOf(
                 description = LogEventType.ALARM_DISARMED.description(),
                 timeStamp = "11:00 AM",
                 type = LogEventType.ALARM_DISARMED
+            )
+        )
+    ),
+    GroupedLogModel(
+        day = "Yesterday",
+        securityLogs = listOf(
+            SecurityLogModel(
+                id = 3,
+                title = LogEventType.WARNING_TRIGGERED.title(),
+                description = LogEventType.WARNING_TRIGGERED.description(),
+                timeStamp = "10:00 AM",
+                type = LogEventType.WARNING_TRIGGERED
+            ),
+            SecurityLogModel(
+                id = 4,
+                title = LogEventType.POCKET_MODE_ARMED.title(),
+                description = LogEventType.POCKET_MODE_ARMED.description(),
+                timeStamp = "10:30 AM",
+                type = LogEventType.POCKET_MODE_ARMED
             )
         )
     )

@@ -38,7 +38,10 @@ fun LogChip(
     val selectedColor = if (isSelected) primary else Color.White.copy(alpha = .6f)
     Box(
         modifier = modifier
-            .background(Color.White.copy(alpha = 0.10f))
+            .background(
+                color = Color.White.copy(alpha = .15f),
+                shape = RoundedCornerShape(100.dp)
+            )
             .border(
                 width = 1.dp,
                 color = selectedColor,
@@ -72,58 +75,23 @@ fun LogChips(
     selectedMode: String,
     onSelected: (String) -> Unit
 ) {
-
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         content = {
             logModes.forEach { logMode ->
                 val selectedColor = if (logMode == selectedMode) primary else Color.White.copy(alpha = .6f)
-//                LogChip(
-//                    isSelected = logMode == selectedMode,
-//                    onSelected = { onSelected(logMode) },
-//                    content = {
-//                        Text(
-//                            text = logMode,
-//                            color = selectedColor
-//                        )
-//                    }
-//                )
-                Row(
-                    modifier = modifier
-                        .background(Color.White.copy(alpha = 0.10f))
-                        .border(
-                            width = 1.dp,
-                            color = selectedColor,
-                            shape = RoundedCornerShape(100.dp)
-                        )
-                        .then(
-                            if (logMode == selectedMode) Modifier.shadow(
-                                elevation = 10.dp,
-                                shape = RoundedCornerShape(100.dp),
-                                ambientColor = primary.copy(.5f),
-                                spotColor = primary
-                            ) else Modifier
-                        )
-                        .clickable(
-                            onClick = { onSelected(logMode) },
-                            interactionSource = remember { MutableInteractionSource() }
-                        )
-                        .padding(
-                            horizontal = 10.dp,
-                            vertical = 5.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
+                LogChip(
+                    isSelected = selectedMode == logMode,
+                    onSelected = { onSelected(logMode) },
                     content = {
                         Text(
                             text = logMode,
                             color = selectedColor
                         )
                     }
-                )
+              )
             }
         }
     )
@@ -135,9 +103,7 @@ private fun LogChipPreview() {
     LogChip(
         isSelected = true,
         content = {
-            Text(
-             text = "All Events", color = primary
-            )
+            Text(text = "All Events", color = primary)
         }
     )
 }
