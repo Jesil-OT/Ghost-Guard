@@ -11,6 +11,11 @@ import com.jesil.ghostguard.core.data.SecurityRepository
 import com.jesil.ghostguard.core.service.GhostGuardService
 import com.jesil.ghostguard.core.service.ServiceActions
 import com.jesil.ghostguard.core.utils.Constants.ACTION_UPDATE_ACTIVITY_STATUS
+import com.jesil.ghostguard.logs.domain.SecurityLog
+import com.jesil.ghostguard.logs.domain.SecurityLogRepository
+import com.jesil.ghostguard.logs.presentation.model.LogEventType
+import com.jesil.ghostguard.logs.presentation.model.description
+import com.jesil.ghostguard.logs.presentation.model.title
 import com.jesil.ghostguard.warning.domain.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +27,7 @@ const val TAG = "WarningViewModel"
 class WarningViewModel @Inject constructor(
     private val application: Application,
     private val timerRepository: TimerRepository,
+    private val logRepository: SecurityLogRepository
 ): AndroidViewModel(application) {
     var countDownTimerValue = timerRepository.countDownFlow
     var triggerAlert = timerRepository.isTimerFinished
@@ -37,6 +43,14 @@ class WarningViewModel @Inject constructor(
                 if (timerDone){
                     Log.d(TAG, "isTimerDone: If not authenticated, play alert sound and notify authorities")
                     launchSoundIntent(actions = ServiceActions.START_SOUND.toString())
+                    logRepository.addLog(
+                        SecurityLog(
+                            title = LogEventType.ALARM_TRIGGERED.title(),
+                            description = LogEventType.ALARM_TRIGGERED.description(),
+                            timeStamp = System.currentTimeMillis(),
+                            type = LogEventType.ALARM_TRIGGERED,
+                        )
+                    )
                 }
             }
         }
@@ -48,6 +62,17 @@ class WarningViewModel @Inject constructor(
 
     fun cancelTimer(){
         timerRepository.cancelTimer()
+        // disable log event
+        viewModelScope.launch {
+            logRepository.addLog(
+                SecurityLog(
+                    title = LogEventType.ALARM_DISARMED.title(),
+                    description = LogEventType.ALARM_DISARMED.description(),
+                    timeStamp = System.currentTimeMillis(),
+                    type = LogEventType.ALARM_DISARMED,
+                )
+            )
+        }
     }
 
     fun launchSoundIntent(actions: String){
@@ -57,12 +82,4 @@ class WarningViewModel @Inject constructor(
             }
         )
     }
-
-    /**
-     * This function checks to see if the warning activity
-     * has been killed accidentally by the thief or the user
-     *
-     * it sends intent when the warning activity is no longer visible on the screen
-     * and the user has not authenticated it means you are trying to use a backdoor approach
-     * so the app will launch this function when it sees that*/
 }
