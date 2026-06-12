@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
@@ -39,9 +42,12 @@ import com.jesil.ghostguard.logs.presentation.model.title
 
 @Composable
 fun SecurityLogScreen() {
+    val viewModel: SecurityLogViewModel = hiltViewModel()
+    val securityLogs by viewModel.logs.collectAsStateWithLifecycle()
+    
     val selectedMode = remember { mutableStateOf(logModes.first()) }
     SecurityLogScreenInnerScreen(
-        securityLogs = fakeHistory,
+        securityLogs = securityLogs,
         logModes = logModes,
         onLogSelected = { selectedMode.value = it }
     )

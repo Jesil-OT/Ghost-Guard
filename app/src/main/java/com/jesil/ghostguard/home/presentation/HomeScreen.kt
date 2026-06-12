@@ -44,10 +44,11 @@ import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
 
 const val TAG = "HomeScreen"
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    modifier: Modifier = Modifier
+) {
     val viewModel: HomeViewModel = hiltViewModel()
     val isMotionDetectionArmed by viewModel.isMotionDetectionArmed.collectAsStateWithLifecycle()
     val pocketModeArmed by viewModel.isPocketModeEnabled.collectAsStateWithLifecycle()
@@ -68,50 +69,10 @@ fun HomeScreen() {
         }
     }
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(background),
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(horizontal = 15.dp),
-                navigationIcon = {
-                    Icon(
-                        modifier = Modifier.size(30.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.outline_security),
-                        contentDescription = stringResource(R.string.ghost_guard),
-                        tint = primary
-                    )
-                },
-                title = {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp),
-                        text = stringResource(R.string.ghost_guard),
-                        style = Typographys.bodyLarge.copy(
-                            color = primary,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                },
-                actions = {
-                    Icon(
-                        modifier = Modifier.size(30.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.outline_settings),
-                        contentDescription = stringResource(R.string.settings),
-                        tint = primary
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = background)
-            )
-        },
-        content = { paddingValues ->
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
-                    .background(background)
-                    .padding(paddingValues),
+                    .background(background),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 content = {
@@ -154,7 +115,6 @@ fun HomeScreen() {
                     )
                 }
             )
-        }
-    )
+
 }
 

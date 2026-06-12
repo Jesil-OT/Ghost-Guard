@@ -18,6 +18,11 @@ import com.jesil.ghostguard.core.sensors.SensorMonitor
 import com.jesil.ghostguard.core.utils.NotificationHelper
 import com.jesil.ghostguard.core.utils.SoundManager
 import com.jesil.ghostguard.home.domain.PocketModeRepository
+import com.jesil.ghostguard.logs.domain.SecurityLog
+import com.jesil.ghostguard.logs.domain.SecurityLogRepository
+import com.jesil.ghostguard.logs.presentation.model.LogEventType
+import com.jesil.ghostguard.logs.presentation.model.description
+import com.jesil.ghostguard.logs.presentation.model.title
 import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +44,8 @@ class GhostGuardService: Service() {
     @Inject lateinit var securityRepository: SecurityRepository
     @Inject lateinit var securityDataStore: SecurityDataStore
     @Inject lateinit var pocketModeRepository: PocketModeRepository
+
+    @Inject lateinit var logRepository: SecurityLogRepository
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
@@ -68,6 +75,15 @@ class GhostGuardService: Service() {
                         soundManager.stopSound()
                         launchWarningMode()
                         startWatchdog()
+                        logRepository.addLog(
+                            SecurityLog(
+                                title = LogEventType.WARNING_TRIGGERED.title(),
+                                description = LogEventType.WARNING_TRIGGERED.description(),
+                                timeStamp = System.currentTimeMillis(),
+                                type = LogEventType.WARNING_TRIGGERED
+                            )
+                        )
+
                     }
                     SecurityState.ALARM -> soundManager.startSound()
                 }
@@ -132,6 +148,13 @@ class GhostGuardService: Service() {
         securityRepository.updateState(SecurityState.ARMED)
     }
 
+    /**
+     * This function checks to see if the warning activity
+     * has been killed accidentally by the thief or the user
+     *
+     * it sends intent when the warning activity is no longer visible on the screen
+     * and the user has not authenticated it means you are trying to use a backdoor approach
+     * so the app will launch this function when it sees that*/
     private fun startWatchdog(){
         serviceScope.launch {
             securityDataStore.isWarningActiveFLow.collect { isActive ->
