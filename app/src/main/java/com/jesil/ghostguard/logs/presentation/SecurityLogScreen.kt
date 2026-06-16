@@ -16,11 +16,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composable 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -45,31 +46,45 @@ fun SecurityLogScreen() {
     val viewModel: SecurityLogViewModel = hiltViewModel()
     val securityLogs by viewModel.logs.collectAsStateWithLifecycle()
     
-    val selectedMode = remember { mutableStateOf(logModes.first()) }
+    var selectedMode by remember { mutableStateOf(logModes.first()) }
+
+//    val filteredLogs = remember(securityLogs, selectedMode) {
+//        when (selectedMode) {
+//            "Alerts" -> {
+//                securityLogs.map { groupedLog ->
+//                    groupedLog.copy(
+//                        securityLogs = groupedLog.securityLogs.filter { log ->
+//                            log.type == LogEventType.ALARM_TRIGGERED ||
+//                                    log.type == LogEventType.WARNING_TRIGGERED ||
+//                                    log.type == LogEventType.ALARM_DISARMED
+//                        }
+//                    )
+//                }.filter { it.securityLogs.isNotEmpty() }
+//            }
+//
+//            "System" -> {
+//                securityLogs.map { groupedLog ->
+//                    groupedLog.copy(
+//                        securityLogs = groupedLog.securityLogs.filter { log ->
+//                            log.type == LogEventType.SYSTEM_ARMED ||
+//                                    log.type == LogEventType.SYSTEM_DISARMED ||
+//                                    log.type == LogEventType.POCKET_MODE_ARMED ||
+//                                    log.type == LogEventType.POCKET_MODE_DISARMED
+//                        }
+//                    )
+//                }.filter { it.securityLogs.isNotEmpty() }
+//            }
+//
+//            else -> securityLogs
+//        }
+//    }
+
     SecurityLogScreenInnerScreen(
         securityLogs = securityLogs,
         logModes = logModes,
-        onLogSelected = { selectedMode.value = it }
+        selectedMode = selectedMode,
+        onLogSelected = { currentLog -> selectedMode = currentLog }
     )
-    LaunchedEffect(selectedMode.value) {
-        //TODO: Filter logs based on selected mode
-        when(selectedMode.value){
-            "All Events" -> { fakeHistory }
-            "Alerts" -> {
-                fakeHistory.map { groupedLogModel ->
-                    groupedLogModel.securityLogs.filter { securityLogModel ->
-                        securityLogModel.type == LogEventType.ALARM_TRIGGERED || securityLogModel.type == LogEventType.WARNING_TRIGGERED}
-                }
-            }
-            "System" -> {
-                fakeHistory.map { groupedLogModel ->
-                    groupedLogModel.securityLogs.filter { securityLogModel ->
-                        securityLogModel.type == LogEventType.SYSTEM_ARMED || securityLogModel.type == LogEventType.POCKET_MODE_ARMED
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -77,7 +92,8 @@ fun SecurityLogScreenInnerScreen(
     modifier: Modifier = Modifier,
     securityLogs: List<GroupedLogModel>,
     logModes: List<String>,
-    onLogSelected: (String) -> Unit = {}
+    selectedMode: String,
+    onLogSelected: (String) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -106,7 +122,7 @@ fun SecurityLogScreenInnerScreen(
                 .horizontalScroll(rememberScrollState())
                 .padding(bottom = 20.dp),
             logModes = logModes,
-            selectedMode = logModes.first(),
+            selectedMode = selectedMode,
             onSelected = onLogSelected
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -154,6 +170,7 @@ private fun SecurityLogScreenPreview() {
     SecurityLogScreenInnerScreen(
         securityLogs = fakeHistory,
         logModes = logModes,
+        selectedMode = logModes.first(),
         onLogSelected = {}
     )
 }

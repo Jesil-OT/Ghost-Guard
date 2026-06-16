@@ -15,9 +15,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -56,10 +60,8 @@ fun LogChip(
                     spotColor = primary
                 ) else Modifier
             )
-            .clickable(
-                onClick = onSelected,
-                interactionSource = remember { MutableInteractionSource() }
-            )
+            .clip(RoundedCornerShape(100.dp))
+            .clickable { onSelected() }
             .padding(
                 horizontal = 10.dp,
                 vertical = 5.dp
