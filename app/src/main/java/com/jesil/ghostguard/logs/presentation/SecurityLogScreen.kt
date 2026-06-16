@@ -148,7 +148,7 @@ fun SecurityLogScreenInnerScreen(
     }
 }
 
-@Preview
+@Preview(device = "spec:width=360dp,height=788dp")
 @Composable
 private fun SecurityLogScreenPreview() {
     SecurityLogScreenInnerScreen(

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.primary
 import com.jesil.ghostguard.logs.presentation.logModes
 
@@ -88,7 +89,9 @@ fun LogChips(
                     content = {
                         Text(
                             text = logMode,
-                            color = selectedColor
+                            style = Typographys.bodySmall.copy(
+                                color = selectedColor
+                            )
                         )
                     }
               )
