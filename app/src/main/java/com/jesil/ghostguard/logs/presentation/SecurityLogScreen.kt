@@ -17,14 +17,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,6 +33,7 @@ import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
 import com.jesil.ghostguard.logs.presentation.components.LogChips
 import com.jesil.ghostguard.logs.presentation.components.LogItem
+import com.jesil.ghostguard.logs.presentation.components.LogItemHeader
 import com.jesil.ghostguard.logs.presentation.model.LogEventType
 import com.jesil.ghostguard.logs.presentation.model.SecurityLogModel
 import com.jesil.ghostguard.logs.presentation.model.GroupedLogModel
@@ -132,29 +131,7 @@ fun SecurityLogScreenInnerScreen(
             contentPadding = PaddingValues(bottom = 20.dp),
             content = {
                 securityLogs.forEach { groupedLogModel ->
-                    item {
-                        Text(
-                            modifier = Modifier
-                                .background(
-                                    Color.Black.copy(alpha = .15f),
-                                    shape = RoundedCornerShape(100.dp)
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = if (groupedLogModel.day == "Today") primary else Color.White.copy(
-                                        .5f
-                                    ),
-                                    shape = RoundedCornerShape(100.dp)
-                                )
-                                .padding(horizontal = 10.dp, vertical = 2.dp),
-                            text = groupedLogModel.day,
-                            style = Typographys.bodySmall.copy(
-                                color = if (groupedLogModel.day == "Today") primary else Color.White.copy(
-                                    .5f
-                                )
-                            )
-                        )
-                    }
+                    item { LogItemHeader(groupedLogModel.day) }
                     items(groupedLogModel.securityLogs) { securityLog ->
                         LogItem(logModel = securityLog)
                     }
@@ -163,6 +140,7 @@ fun SecurityLogScreenInnerScreen(
         )
     }
 }
+
 
 @Preview(device = "spec:width=360dp,height=788dp")
 @Composable
@@ -202,6 +180,18 @@ val fakeHistory = listOf(
                 timeStamp = "11:00 AM",
                 type = LogEventType.ALARM_DISARMED
             )
+        )
+    ),
+    GroupedLogModel(
+        day = "Today",
+        securityLogs = listOf(
+            SecurityLogModel(
+                id = 6,
+                title = LogEventType.SYSTEM_ARMED.title(),
+                description = LogEventType.SYSTEM_ARMED.description(),
+                timeStamp = "10:00 AM",
+                type = LogEventType.SYSTEM_ARMED
+            ),
         )
     ),
     GroupedLogModel(

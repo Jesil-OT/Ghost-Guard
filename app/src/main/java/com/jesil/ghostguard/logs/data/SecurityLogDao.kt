@@ -15,15 +15,15 @@ interface SecurityLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: SecurityLogEntity)
 
-    @Query("SELECT * FROM security_logs")
+    @Query("SELECT * FROM security_logs ORDER BY timestamp DESC")
     fun getAllLogs(): Flow<List<SecurityLogEntity>>
 
-    @Query("SELECT * FROM security_logs WHERE log_type = :logType")
+    @Query("SELECT * FROM security_logs WHERE log_type = :logType ORDER BY timestamp DESC")
     fun getLogsByType(logType: LogEventType): Flow<List<SecurityLogEntity>>
 
     @Query("DELETE FROM security_logs WHERE id = :logId")
     suspend fun deleteLogById(logId: Int)
-//
-//    @Delete
-//    suspend fun deleteAllLogs()
+
+    @Query("DELETE FROM security_logs")
+    suspend fun deleteAllLogs()
 }
