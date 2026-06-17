@@ -19,13 +19,11 @@ class SecurityLogRepositoryImpl @Inject constructor(
         securityLogDao.insertLog(log.toEntity())
     }
 
-    override fun getAllLogs(): Flow<List<SecurityLog>> = flow {
-        securityLogDao.getAllLogs().collect { logs ->
+    override fun getLogsByType(logType: List<LogEventType>): Flow<List<SecurityLog>> = flow {
+        securityLogDao.getLogsByType(logType).collect { logs ->
             emit(logs.map { it.toDomain() })
         }
     }
-
-    override fun getLogsByType(logType: LogEventType): Flow<List<SecurityLog>> = flow {}
 
     override suspend fun deleteLogById(logId: Int) {
 //        TODO("Not yet implemented")

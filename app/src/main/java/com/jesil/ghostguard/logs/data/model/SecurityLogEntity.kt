@@ -13,10 +13,3 @@ data class SecurityLogEntity(
     @ColumnInfo(name = "timestamp") val timeStamp: Long
 )
 
-//class Converters {
-//    @TypeConverter
-//    fun fromLogEventType(type: LogEventType): String = type.name
-//
-//    @TypeConverter
-//    fun toLogEventType(value: String): LogEventType = LogEventType.valueOf(value)
-//}
