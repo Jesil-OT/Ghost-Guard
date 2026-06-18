@@ -37,52 +37,23 @@ import com.jesil.ghostguard.logs.presentation.components.LogItemHeader
 import com.jesil.ghostguard.logs.presentation.model.LogEventType
 import com.jesil.ghostguard.logs.presentation.model.SecurityLogModel
 import com.jesil.ghostguard.logs.presentation.model.GroupedLogModel
+import com.jesil.ghostguard.logs.presentation.model.LogTypeUI
+import com.jesil.ghostguard.logs.presentation.model.SecurityLogAction
 import com.jesil.ghostguard.logs.presentation.model.description
+import com.jesil.ghostguard.logs.presentation.model.logModes
 import com.jesil.ghostguard.logs.presentation.model.title
 
 @Composable
 fun SecurityLogScreen() {
     val viewModel: SecurityLogViewModel = hiltViewModel()
     val securityLogs by viewModel.logs.collectAsStateWithLifecycle()
-    
-    var selectedMode by remember { mutableStateOf(logModes.first()) }
-
-//    val filteredLogs = remember(securityLogs, selectedMode) {
-//        when (selectedMode) {
-//            "Alerts" -> {
-//                securityLogs.map { groupedLog ->
-//                    groupedLog.copy(
-//                        securityLogs = groupedLog.securityLogs.filter { log ->
-//                            log.type == LogEventType.ALARM_TRIGGERED ||
-//                                    log.type == LogEventType.WARNING_TRIGGERED ||
-//                                    log.type == LogEventType.ALARM_DISARMED
-//                        }
-//                    )
-//                }.filter { it.securityLogs.isNotEmpty() }
-//            }
-//
-//            "System" -> {
-//                securityLogs.map { groupedLog ->
-//                    groupedLog.copy(
-//                        securityLogs = groupedLog.securityLogs.filter { log ->
-//                            log.type == LogEventType.SYSTEM_ARMED ||
-//                                    log.type == LogEventType.SYSTEM_DISARMED ||
-//                                    log.type == LogEventType.POCKET_MODE_ARMED ||
-//                                    log.type == LogEventType.POCKET_MODE_DISARMED
-//                        }
-//                    )
-//                }.filter { it.securityLogs.isNotEmpty() }
-//            }
-//
-//            else -> securityLogs
-//        }
-//    }
+    val logChipState by viewModel.logChipState.collectAsStateWithLifecycle()
 
     SecurityLogScreenInnerScreen(
         securityLogs = securityLogs,
         logModes = logModes,
-        selectedMode = selectedMode,
-        onLogSelected = { currentLog -> selectedMode = currentLog }
+        selectedMode = logChipState,
+        onLogSelected = { viewModel.onAction(SecurityLogAction.OnLogChipSelected(it))}
     )
 }
 
@@ -90,9 +61,9 @@ fun SecurityLogScreen() {
 fun SecurityLogScreenInnerScreen(
     modifier: Modifier = Modifier,
     securityLogs: List<GroupedLogModel>,
-    logModes: List<String>,
-    selectedMode: String,
-    onLogSelected: (String) -> Unit,
+    logModes: List<LogTypeUI>,
+    selectedMode: LogTypeUI,
+    onLogSelected: (LogTypeUI) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -153,7 +124,6 @@ private fun SecurityLogScreenPreview() {
     )
 }
 
-val logModes = listOf("All Events", "Alerts", "System")
 
 val fakeHistory = listOf(
     GroupedLogModel(
@@ -180,18 +150,6 @@ val fakeHistory = listOf(
                 timeStamp = "11:00 AM",
                 type = LogEventType.ALARM_DISARMED
             )
-        )
-    ),
-    GroupedLogModel(
-        day = "Today",
-        securityLogs = listOf(
-            SecurityLogModel(
-                id = 6,
-                title = LogEventType.SYSTEM_ARMED.title(),
-                description = LogEventType.SYSTEM_ARMED.description(),
-                timeStamp = "10:00 AM",
-                type = LogEventType.SYSTEM_ARMED
-            ),
         )
     ),
     GroupedLogModel(

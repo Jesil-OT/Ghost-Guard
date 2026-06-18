@@ -15,11 +15,8 @@ interface SecurityLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: SecurityLogEntity)
 
-    @Query("SELECT * FROM security_logs ORDER BY timestamp DESC")
-    fun getAllLogs(): Flow<List<SecurityLogEntity>>
-
-    @Query("SELECT * FROM security_logs WHERE log_type = :logType ORDER BY timestamp DESC")
-    fun getLogsByType(logType: LogEventType): Flow<List<SecurityLogEntity>>
+    @Query("SELECT * FROM security_logs WHERE log_type IN (:logType) ORDER BY timestamp DESC")
+    fun getLogsByType(logType: List<LogEventType>): Flow<List<SecurityLogEntity>>
 
     @Query("DELETE FROM security_logs WHERE id = :logId")
     suspend fun deleteLogById(logId: Int)
