@@ -2,26 +2,18 @@ package com.jesil.ghostguard.home.presentation
 
 import android.Manifest
 import android.os.Build
-import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,20 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.R
-import com.jesil.ghostguard.home.presentation.components.FeatureCard
-import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
-import com.jesil.ghostguard.core.theme.primary
+import com.jesil.ghostguard.home.presentation.components.FeatureCard
 
 const val TAG = "HomeScreen"
+
 @Preview
 @Composable
 fun HomeScreen(
@@ -53,6 +42,8 @@ fun HomeScreen(
     val isMotionDetectionArmed by viewModel.isMotionDetectionArmed.collectAsStateWithLifecycle()
     val pocketModeArmed by viewModel.isPocketModeEnabled.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -61,7 +52,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect( Unit) {
+    LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
@@ -69,52 +60,55 @@ fun HomeScreen(
         }
     }
 
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(background),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                content = {
-                    FeatureCard(
-                        modifier = Modifier.padding(horizontal = 25.dp),
-                        title = "Motion Detection",
-                        description = if (isMotionDetectionArmed) "Armed" else "Detection inactive",
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.outline_sensors),
-                                tint = primary,
-                                contentDescription = null
-                            )
-                        },
-                        isToggled = isMotionDetectionArmed,
-                        onToggle = {
-                            viewModel.onAction(HomeActions.ToggleMotionDetection(!isMotionDetectionArmed))
-                        }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        content = {
+            FeatureCard(
+                modifier = Modifier.padding(horizontal = 25.dp),
+                title = "Motion Detection",
+                description = if (isMotionDetectionArmed) "Armed" else "Detection inactive",
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.outline_sensors),
+                        tint = Color.White,
+                        contentDescription = null
                     )
-                    Spacer(Modifier.height(20.dp))
-                    FeatureCard(
-                        modifier = Modifier.padding(horizontal = 25.dp),
-                        title = "Pocket Mode",
-                        enabled = isMotionDetectionArmed,
-                        description = if (pocketModeArmed) "active" else "inactive",
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.round_smartphone),
-                                tint = animateColorAsState(
-                                    targetValue = if (isMotionDetectionArmed) primary else Color.Black,
-                                    label = "icon_enable_color"
-                                ).value,
-                                contentDescription = null
-                            )
-                        },
-                        isToggled = pocketModeArmed,
-                        onToggle = {
-                            viewModel.onAction(HomeActions.TogglePocketMode(!pocketModeArmed))
-                        }
-                    )
+                },
+                isToggled = isMotionDetectionArmed,
+                onToggle = {
+                    viewModel.onAction(HomeActions.ToggleMotionDetection(!isMotionDetectionArmed))
+                    if (isMotionDetectionArmed) {
+                        viewModel.onAction(HomeActions.TogglePocketMode(false))
+                    }
                 }
             )
+            Spacer(Modifier.height(20.dp))
+            FeatureCard(
+                modifier = Modifier.padding(horizontal = 25.dp),
+                title = "Pocket Mode",
+                description = if (pocketModeArmed) "active" else "inactive",
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.round_smartphone),
+                        tint = Color.White,
+                        contentDescription = null
+                    )
+                },
+                isToggled = pocketModeArmed,
+                onToggle = {
+                    if (!isMotionDetectionArmed) {
+                        Toast.makeText(context, "Please turn on Motion Detection to use feature!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.onAction(HomeActions.TogglePocketMode(!pocketModeArmed))
+                    }
+                }
+            )
+        }
+    )
 
 }
 

@@ -39,21 +39,19 @@ fun FeatureCard(
     modifier: Modifier = Modifier,
     title: String,
     description: String,
-    enabled: Boolean = true,
     isToggled: Boolean = false,
     icon: @Composable () -> Unit,
     onToggle: (Boolean) -> Unit
 ) {
     val enabledColor = animateColorAsState(
-        targetValue = if (enabled) Color.White else Color.Black.copy(.8f),
+        targetValue = Color.White,
         label = "icon_enable_color"
     )
     GlassmorphismCard(
         modifier = modifier.fillMaxWidth().clickable(
-            onClick = { if (enabled) onToggle(!isToggled) }
+            onClick = { onToggle(!isToggled) }
         ),
         isFlipped = isToggled,
-        enabled = enabled,
         padding = 0.dp
     ) {
         Row(
@@ -79,7 +77,6 @@ fun FeatureCard(
                     size = 360.dp,
                     padding = 8.dp,
                     isFlipped = isToggled,
-                    enabled = enabled
                 ) { icon() }
             }
             Spacer(Modifier.width(15.dp))
@@ -104,7 +101,6 @@ fun FeatureCard(
                 modifier = Modifier.scale(.7f),
                 checked = isToggled,
                 onCheckedChange = onToggle,
-                enabled = enabled,
                 thumbContent = {
                     if (isToggled)
                         Icon(
@@ -120,12 +116,6 @@ fun FeatureCard(
                     uncheckedBorderColor = Color.White.copy(.5f),
                     uncheckedTrackColor = Color.White.copy(.4f),
                     uncheckedThumbColor = Color.White.copy(.5f),
-                    disabledUncheckedThumbColor = Color.Black.copy(.5f),
-                    disabledUncheckedTrackColor = Color.Black.copy(.3f),
-                    disabledUncheckedBorderColor = Color.Black,
-                    disabledCheckedThumbColor = Color.Black.copy(.5f),
-                    disabledCheckedTrackColor = Color.Black.copy(.3f),
-                    disabledCheckedBorderColor = Color.Black
                 )
             )
         }
