@@ -9,10 +9,11 @@ import com.jesil.ghostguard.R
 enum class Destination(
     val route: String,
     val title: String,
-    val icon: Int,
+    val selectedIcon: Int,
+    val unselectedIcon: Int?,
     val contentDescription: String
 ) {
-    HOME("home", "Home", R.drawable.ic_shield_filled, "Home"),
-    SECURITY_LOGS("security_logs", "Security Logs", R.drawable.ic_log_history, "Security Logs"),
-    SETTINGS("settings", "Settings", R.drawable.ic_settings_filled, "Settings")
+    HOME("home", "Home", R.drawable.ic_shield_filled, R.drawable.ic_shield_outline,"Home"),
+    SECURITY_LOGS("security_logs", "Security Logs", R.drawable.ic_log_history, null,"Security Logs"),
+    SETTINGS("settings", "Settings", R.drawable.ic_settings_filled, R.drawable.outline_settings,"Settings")
 }
