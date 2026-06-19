@@ -4,12 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -25,7 +22,6 @@ fun GlassmorphismCard(
     size: Dp = 25.dp,
     padding: Dp = 10.dp,
     isFlipped: Boolean = false,
-    enabled: Boolean = true,
     isError: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -58,7 +54,7 @@ fun GlassmorphismCard(
     )
 
     val background =
-        if (isFlipped) glassBrush2 else if (!enabled) glassBrush3 else if (isError) glassBrush4 else glassBrush
+        if (isFlipped) glassBrush2 else if (isError) glassBrush4 else glassBrush
 
     Box(
         modifier = modifier

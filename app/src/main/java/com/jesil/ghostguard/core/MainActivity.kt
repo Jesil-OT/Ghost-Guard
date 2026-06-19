@@ -36,11 +36,14 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jesil.ghostguard.R
+import com.jesil.ghostguard.core.components.GhostGuardToolbar
 import com.jesil.ghostguard.core.navigation.Destination
 import com.jesil.ghostguard.core.theme.GhostGuardTheme
 import com.jesil.ghostguard.core.theme.Typographys
@@ -72,54 +75,37 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun AppContent() {
         val navController = rememberNavController()
-        val startDestination = Destination.HOME
-        var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
         Scaffold(
             modifier = Modifier
                 .background(background)
                 .fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .padding(start = 15.dp)
-                                .size(30.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.outline_security),
-                            contentDescription = stringResource(R.string.ghost_guard),
-                            tint = primary
-                        )
-                    },
-                    title = {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 15.dp),
-                            text = stringResource(R.string.ghost_guard),
-                            style = Typographys.bodyLarge.copy(
-                                color = primary,
-                                textAlign = TextAlign.Center
-                            )
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = background)
-                )
-            },
+            topBar = { GhostGuardToolbar() },
             content = { innerPadding ->
-                AppNavHost(navController, startDestination, modifier = Modifier.padding(innerPadding))
+                AppNavHost(navController, Destination.HOME, modifier = Modifier.padding(innerPadding))
             },
             bottomBar = {
                 NavigationBar(windowInsets = NavigationBarDefaults.windowInsets, containerColor = background) {
-                    Destination.entries.forEachIndexed { index, destination ->
+                    Destination.entries.forEach { destination ->
+                        val isSelected = currentRoute == destination.route
                         NavigationBarItem(
-                            selected = selectedDestination == index,
+                            selected = isSelected,
                             onClick = {
-                                navController.navigate(route = destination.route)
-                                selectedDestination = index
+                                navController.navigate(route = destination.route){
+                                    popUpTo(Destination.HOME.route){
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             },
                             icon = {
                                 Icon(
-                                    imageVector = ImageVector.vectorResource(destination.icon),
+                                    imageVector = ImageVector.vectorResource(
+                                        if (isSelected) destination.selectedIcon else destination.unselectedIcon
+                                            ?: destination.selectedIcon
+                                    ),
                                     contentDescription = destination.contentDescription
                                 )
                             },
@@ -127,16 +113,16 @@ class MainActivity : ComponentActivity() {
                                 Text(
                                     destination.title,
                                     style = Typographys.bodyMedium.copy(
-                                        color = primary
+                                        fontSize = 14.sp
                                     )
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = primary,
-                                selectedTextColor = Color.White,
+                                selectedTextColor = primary,
                                 indicatorColor = primary.copy(alpha = 0.1f),
-                                unselectedIconColor = Color.White.copy(alpha = 0.5f),
-                                unselectedTextColor = Color.White.copy(alpha = 0.5f),
+                                unselectedIconColor = Color.White.copy(alpha = 0.7f),
+                                unselectedTextColor = Color.White.copy(alpha = 0.7f),
                             )
                         )
                     }
@@ -161,7 +147,9 @@ class MainActivity : ComponentActivity() {
                     when (destination) {
                         Destination.HOME -> HomeScreen()
                         Destination.SECURITY_LOGS -> SecurityLogScreen()
-                        Destination.SETTINGS -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){Text(text = "Settings")}}
+                        Destination.SETTINGS -> Box(modifier = Modifier
+                            .fillMaxSize()
+                            .background(background), contentAlignment = Alignment.Center){Text(text = "Settings")}}
                     }
                 }
             }

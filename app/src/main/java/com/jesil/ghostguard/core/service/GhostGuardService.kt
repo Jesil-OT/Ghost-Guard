@@ -175,7 +175,9 @@ class GhostGuardService: Service() {
     private fun launchWarningMode(){
         if (Settings.canDrawOverlays(this)) {
             val intent = Intent(this, WarningActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+                )
             }
             startActivity(intent)
         }
