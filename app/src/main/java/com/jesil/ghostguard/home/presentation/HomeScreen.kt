@@ -29,7 +29,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.theme.background
-import com.jesil.ghostguard.home.presentation.components.FeatureCard
+import com.jesil.ghostguard.home.presentation.components.SecurityControl
+import com.jesil.ghostguard.home.presentation.components.StatusIndicator
 
 const val TAG = "HomeScreen"
 
@@ -65,9 +66,14 @@ fun HomeScreen(
             .fillMaxSize()
             .background(background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
         content = {
-            FeatureCard(
+            Spacer(Modifier.height(80.dp))
+            StatusIndicator(
+                modifier = Modifier.padding(horizontal = 25.dp),
+                status = isMotionDetectionArmed
+            )
+            Spacer(Modifier.height(100.dp))
+            SecurityControl(
                 modifier = Modifier.padding(horizontal = 25.dp),
                 title = "Motion Detection",
                 description = if (isMotionDetectionArmed) "Armed" else "Detection inactive",
@@ -87,7 +93,7 @@ fun HomeScreen(
                 }
             )
             Spacer(Modifier.height(20.dp))
-            FeatureCard(
+            SecurityControl(
                 modifier = Modifier.padding(horizontal = 25.dp),
                 title = "Pocket Mode",
                 description = if (pocketModeArmed) "active" else "inactive",
