@@ -1,9 +1,11 @@
 package com.jesil.ghostguard.logs.presentation
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,22 +17,30 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
+import com.jesil.ghostguard.logs.presentation.components.DeleteLogsDialog
 import com.jesil.ghostguard.logs.presentation.components.LogChips
 import com.jesil.ghostguard.logs.presentation.components.LogItem
 import com.jesil.ghostguard.logs.presentation.components.LogItemHeader
@@ -44,7 +54,10 @@ import com.jesil.ghostguard.logs.presentation.model.logModes
 import com.jesil.ghostguard.logs.presentation.model.title
 
 @Composable
-fun SecurityLogScreen() {
+fun SecurityLogScreen(
+    deleteDialogState: Boolean,
+    onDismissCLick: () -> Unit,
+) {
     val viewModel: SecurityLogViewModel = hiltViewModel()
     val securityLogs by viewModel.logs.collectAsStateWithLifecycle()
     val logChipState by viewModel.logChipState.collectAsStateWithLifecycle()
@@ -53,8 +66,21 @@ fun SecurityLogScreen() {
         securityLogs = securityLogs,
         logModes = logModes,
         selectedMode = logChipState,
-        onLogSelected = { viewModel.onAction(SecurityLogAction.OnLogChipSelected(it))}
+        onLogSelected = { viewModel.onAction(SecurityLogAction.OnLogChipSelected(it)) }
     )
+
+    if (deleteDialogState) {
+        DeleteLogsDialog(
+            title =  "Delete all logs",
+            text = "Are you sure you want to delete all logs?",
+            icon = ImageVector.vectorResource(R.drawable.baseline_warning),
+            onDismissRequest = onDismissCLick,
+            onDeleteConfirmation = {
+                viewModel.onAction(SecurityLogAction.OnLogDeleted(null))
+                onDismissCLick()
+            }
+        )
+    }
 }
 
 @Composable
@@ -96,19 +122,54 @@ fun SecurityLogScreenInnerScreen(
             onSelected = onLogSelected
         )
         Spacer(modifier = Modifier.height(10.dp))
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(25.dp),
-            contentPadding = PaddingValues(bottom = 20.dp),
-            content = {
-                securityLogs.forEach { groupedLogModel ->
-                    item { LogItemHeader(groupedLogModel.day) }
-                    items(groupedLogModel.securityLogs) { securityLog ->
-                        LogItem(logModel = securityLog)
-                    }
+        AnimatedContent(
+            modifier = Modifier
+                .fillMaxSize(),
+            targetState = securityLogs.isEmpty(),
+            label = "Empty State"
+        ) { state ->
+            when (state) {
+                true -> Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(bottom = 25.dp)
+                            .background(
+                                Color.Black.copy(alpha = .15f),
+                                shape = RoundedCornerShape(100.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = primary,
+                                shape = RoundedCornerShape(100.dp)
+                            )
+                            .padding(horizontal = 15.dp, vertical = 5.dp),
+                        text = "No logs found!",
+                        style = Typographys.bodyMedium.copy(
+                            color = primary,
+                            textAlign = TextAlign.Center
+                        )
+                    )
                 }
+
+                else -> LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(25.dp),
+                    contentPadding = PaddingValues(bottom = 20.dp),
+                    content = {
+                        securityLogs.forEach { groupedLogModel ->
+                            item { LogItemHeader(groupedLogModel.day) }
+                            items(groupedLogModel.securityLogs) { securityLog ->
+                                LogItem(logModel = securityLog)
+                            }
+                        }
+                    }
+                )
             }
-        )
+
+        }
+
     }
 }
 

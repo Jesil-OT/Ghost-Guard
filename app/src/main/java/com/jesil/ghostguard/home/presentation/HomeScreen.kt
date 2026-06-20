@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,11 +32,8 @@ import com.jesil.ghostguard.home.presentation.components.StatusIndicator
 
 const val TAG = "HomeScreen"
 
-@Preview
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier
-) {
+fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel()
     val isMotionDetectionArmed by viewModel.isMotionDetectionArmed.collectAsStateWithLifecycle()
     val pocketModeArmed by viewModel.isPocketModeEnabled.collectAsStateWithLifecycle()
@@ -62,7 +57,7 @@ fun HomeScreen(
     }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(background),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,7 +102,11 @@ fun HomeScreen(
                 isToggled = pocketModeArmed,
                 onToggle = {
                     if (!isMotionDetectionArmed) {
-                        Toast.makeText(context, "Please turn on Motion Detection to use feature!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Please turn on Motion Detection to use feature!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         viewModel.onAction(HomeActions.TogglePocketMode(!pocketModeArmed))
                     }

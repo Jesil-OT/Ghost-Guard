@@ -29,8 +29,6 @@ class SecurityLogRepositoryImpl @Inject constructor(
 //        TODO("Not yet implemented")
     }
 
-    override suspend fun deleteAllLogs() {
-//        TODO("Not yet implemented")
-    }
+    override suspend fun deleteAllLogs() = securityLogDao.deleteAllLogs()
 
 }

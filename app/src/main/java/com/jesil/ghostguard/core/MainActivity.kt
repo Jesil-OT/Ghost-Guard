@@ -25,6 +25,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -77,23 +79,39 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+        var openDeleteDialog by remember { mutableStateOf(false) }
+
         Scaffold(
             modifier = Modifier
                 .background(background)
                 .fillMaxSize(),
-            topBar = { GhostGuardToolbar() },
+            topBar = {
+                GhostGuardToolbar(
+                    currentScreen = currentRoute,
+                    onDeleteClick = { openDeleteDialog = true }
+                )
+            },
             content = { innerPadding ->
-                AppNavHost(navController, Destination.HOME, modifier = Modifier.padding(innerPadding))
+                AppNavHost(
+                    navController,
+                    Destination.HOME,
+                    modifier = Modifier.padding(innerPadding),
+                    openDeleteDialog,
+                    onDismissDialog = { openDeleteDialog = false },
+                )
             },
             bottomBar = {
-                NavigationBar(windowInsets = NavigationBarDefaults.windowInsets, containerColor = background) {
+                NavigationBar(
+                    windowInsets = NavigationBarDefaults.windowInsets,
+                    containerColor = background
+                ) {
                     Destination.entries.forEach { destination ->
                         val isSelected = currentRoute == destination.route
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                navController.navigate(route = destination.route){
-                                    popUpTo(Destination.HOME.route){
+                                navController.navigate(route = destination.route) {
+                                    popUpTo(Destination.HOME.route) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
@@ -135,7 +153,9 @@ class MainActivity : ComponentActivity() {
     fun AppNavHost(
         navController: NavHostController,
         startDestination: Destination,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        deleteDialogState: Boolean,
+        onDismissDialog: () -> Unit,
     ) {
         NavHost(
             navController,
@@ -146,12 +166,19 @@ class MainActivity : ComponentActivity() {
                 composable(destination.route) {
                     when (destination) {
                         Destination.HOME -> HomeScreen()
-                        Destination.SECURITY_LOGS -> SecurityLogScreen()
-                        Destination.SETTINGS -> Box(modifier = Modifier
-                            .fillMaxSize()
-                            .background(background), contentAlignment = Alignment.Center){Text(text = "Settings")}}
+                        Destination.SECURITY_LOGS -> SecurityLogScreen(
+                            deleteDialogState = deleteDialogState,
+                            onDismissCLick = onDismissDialog,
+                        )
+
+                        Destination.SETTINGS -> Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(background), contentAlignment = Alignment.Center
+                        ) { Text(text = "Settings") }
                     }
                 }
             }
+        }
     }
 }
