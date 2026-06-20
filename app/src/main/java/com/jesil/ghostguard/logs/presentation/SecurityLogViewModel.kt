@@ -19,11 +19,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SecurityLogViewModel @Inject constructor(
-    securityLogRepo: SecurityLogRepository
+   private val securityLogRepo: SecurityLogRepository
 ) : ViewModel() {
 
     private val _logChipState = MutableStateFlow(logModes.first())
@@ -54,6 +55,11 @@ class SecurityLogViewModel @Inject constructor(
         when(action){
             is SecurityLogAction.OnLogChipSelected -> {
                 _logChipState.value = action.currentChip
+            }
+            is SecurityLogAction.OnLogDeleted -> {
+                viewModelScope.launch {
+                    securityLogRepo.deleteAllLogs()
+                }
             }
         }
     }

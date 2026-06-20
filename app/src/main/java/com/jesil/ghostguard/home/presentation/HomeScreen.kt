@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,21 +22,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.theme.background
-import com.jesil.ghostguard.home.presentation.components.FeatureCard
+import com.jesil.ghostguard.home.presentation.components.SecurityControl
+import com.jesil.ghostguard.home.presentation.components.StatusIndicator
 
 const val TAG = "HomeScreen"
 
-@Preview
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier
-) {
+fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel()
     val isMotionDetectionArmed by viewModel.isMotionDetectionArmed.collectAsStateWithLifecycle()
     val pocketModeArmed by viewModel.isPocketModeEnabled.collectAsStateWithLifecycle()
@@ -61,13 +57,18 @@ fun HomeScreen(
     }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
         content = {
-            FeatureCard(
+            Spacer(Modifier.height(80.dp))
+            StatusIndicator(
+                modifier = Modifier.padding(horizontal = 25.dp),
+                status = isMotionDetectionArmed
+            )
+            Spacer(Modifier.height(100.dp))
+            SecurityControl(
                 modifier = Modifier.padding(horizontal = 25.dp),
                 title = "Motion Detection",
                 description = if (isMotionDetectionArmed) "Armed" else "Detection inactive",
@@ -87,7 +88,7 @@ fun HomeScreen(
                 }
             )
             Spacer(Modifier.height(20.dp))
-            FeatureCard(
+            SecurityControl(
                 modifier = Modifier.padding(horizontal = 25.dp),
                 title = "Pocket Mode",
                 description = if (pocketModeArmed) "active" else "inactive",
@@ -101,7 +102,11 @@ fun HomeScreen(
                 isToggled = pocketModeArmed,
                 onToggle = {
                     if (!isMotionDetectionArmed) {
-                        Toast.makeText(context, "Please turn on Motion Detection to use feature!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Please turn on Motion Detection to use feature!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         viewModel.onAction(HomeActions.TogglePocketMode(!pocketModeArmed))
                     }

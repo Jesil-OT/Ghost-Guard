@@ -35,7 +35,7 @@ import com.jesil.ghostguard.core.theme.neutral
 import com.jesil.ghostguard.core.theme.primary
 
 @Composable
-fun FeatureCard(
+fun SecurityControl(
     modifier: Modifier = Modifier,
     title: String,
     description: String,
@@ -124,9 +124,8 @@ fun FeatureCard(
 
 @Preview
 @Composable
-private fun FeatureCardPrev() {
-
-    FeatureCard(
+private fun SecurityControlPrev() {
+    SecurityControl(
         title = "Motion Detection",
         description = "Detection inactive",
         icon = {
