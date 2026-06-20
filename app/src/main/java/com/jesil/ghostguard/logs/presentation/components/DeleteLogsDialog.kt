@@ -7,10 +7,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
 
