@@ -26,7 +26,7 @@ fun SectionHeader(title: String) =
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 5.dp),
+                    .padding(top = 7.dp),
                 color = Color.White.copy(alpha = .2f),
                 thickness = 1.dp
             )
