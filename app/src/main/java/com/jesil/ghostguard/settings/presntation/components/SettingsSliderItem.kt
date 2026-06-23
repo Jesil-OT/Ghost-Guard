@@ -41,7 +41,7 @@ fun SettingsSliderItem(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         Column(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp).weight(1f),
                             verticalArrangement = Arrangement.spacedBy(5.dp),
                             content = {
                                 Text(
@@ -58,10 +58,9 @@ fun SettingsSliderItem(
                                 )
                             }
                         )
-//                            Spacer(modifier = Modifier.weight(1f))
                             Text(
                                 modifier = Modifier
-//                                    .padding(horizontal = 10.dp)
+                                    .padding(end = 10.dp)
                                     .background(
                                     primary.copy(alpha = 0.3f),
                                     shape = RoundedCornerShape(5.dp)
