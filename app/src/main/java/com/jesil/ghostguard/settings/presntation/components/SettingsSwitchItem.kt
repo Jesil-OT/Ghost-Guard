@@ -31,7 +31,7 @@ fun SettingsSwitchItem(
     subTitle: String,
     switchValue: Boolean,
     useIcon: Boolean = false,
-    iconScope : @Composable () -> Unit,
+    iconScope : @Composable () -> Unit = {},
     onSwitchValueChanges: (Boolean) -> Unit
 ) {
     GlassmorphismCard(

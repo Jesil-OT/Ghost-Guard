@@ -43,6 +43,7 @@ import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.primary
 import com.jesil.ghostguard.home.presentation.HomeScreen
 import com.jesil.ghostguard.logs.presentation.SecurityLogScreen
+import com.jesil.ghostguard.settings.presntation.SecuritySettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -160,12 +161,7 @@ class MainActivity : ComponentActivity() {
                             deleteDialogState = deleteDialogState,
                             onDismissCLick = onDismissDialog,
                         )
-
-                        Destination.SETTINGS -> Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(background), contentAlignment = Alignment.Center
-                        ) { Text(text = "Settings") }
+                        Destination.SETTINGS -> SecuritySettingsScreen()
                     }
                 }
             }

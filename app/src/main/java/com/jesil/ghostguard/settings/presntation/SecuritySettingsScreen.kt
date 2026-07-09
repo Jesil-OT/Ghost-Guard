@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jesil.ghostguard.R
 import com.jesil.ghostguard.core.theme.Typographys
 import com.jesil.ghostguard.core.theme.background
@@ -33,6 +36,17 @@ import com.jesil.ghostguard.settings.presntation.components.dropDownAlarmTone
 @Composable
 fun SecuritySettingsScreen() {
 
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val state by settingsViewModel.state.collectAsStateWithLifecycle()
+
+    SecuritySettingsInnerScreen(state, settingsViewModel::onAction)
+}
+
+@Composable
+fun SecuritySettingsInnerScreen(
+    state: SecuritySettingsState,
+    actions: (SettingsEvent) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -55,10 +69,10 @@ fun SecuritySettingsScreen() {
             SettingsSliderItem(
                 title = "Motion Threshold",
                 subTitle = "Adjust the sensitivity of motion detection.",
-                sliderValue = 0.8f,
-                sliderValueLabel = "High",
+                sliderValue = state.motionThreshold,
+                sliderValueLabel = state.motionThresholdLabel,
                 valueRange = 0f..1f,
-                onSliderValueChange = {}
+                onSliderValueChange = { actions(SettingsEvent.UpdateMotionThreshold(it)) }
             )
         }
 
@@ -66,10 +80,10 @@ fun SecuritySettingsScreen() {
             SettingsSliderItem(
                 title = "Proximity Delay",
                 subTitle = "Time before triggering alarm upon detection.",
-                sliderValue = 0.3f,
-                sliderValueLabel = "3s",
+                sliderValue = state.proximityDelaySec,
+                sliderValueLabel = state.proximityDelayLabel,
                 valueRange = 0f..1f,
-                onSliderValueChange = {}
+                onSliderValueChange = { actions(SettingsEvent.UpdateProximityDelay(it)) }
             )
         }
 
@@ -80,9 +94,8 @@ fun SecuritySettingsScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 title = "Flashlight Strobing",
                 subTitle = "Use device flash for visual deterrence.",
-                switchValue = true,
-                onSwitchValueChanges = {},
-                iconScope = {}
+                switchValue = state.flashlightStrobing,
+                onSwitchValueChanges = { actions(SettingsEvent.ToggleFlashlight(it)) },
             )
         }
 
@@ -91,19 +104,16 @@ fun SecuritySettingsScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 title = "Max Volume Override",
                 subTitle = "Bypass system volume limits for alert.",
-                switchValue = false,
-                iconScope = {},
-                onSwitchValueChanges = {},
-
-                )
+                switchValue = state.maxVolumeOverride,
+                onSwitchValueChanges = { actions(SettingsEvent.ToggleMaxOverride(it)) },
+            )
         }
 
         item {
             SettingsDropdownItem(
                 title = "Select Alarm Tone",
                 dropdownItems = dropDownAlarmTone,
-                onDropdownItemSelected = {},
-                onDropdownClicked = {}
+                onDropdownItemSelected = { actions(SettingsEvent.UpdateAlarmTone(it)) },
             )
         }
 
@@ -114,9 +124,9 @@ fun SecuritySettingsScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 title = "Device Admin Status",
                 subTitle = "Prevents unauthorized app uninstallation while armed",
-                switchValue = false,
+                switchValue = state.deviceAdminStatus,
                 useIcon = true,
-                onSwitchValueChanges = {},
+                onSwitchValueChanges = { actions(SettingsEvent.ToggleDeviceAdminStatus(it)) },
                 iconScope = {
                     Icon(
                         modifier = Modifier
@@ -124,12 +134,31 @@ fun SecuritySettingsScreen() {
                             .padding(end = 5.dp),
                         imageVector = ImageVector.vectorResource(R.drawable.ic_admin_panel),
                         contentDescription = null,
-                        tint = if (false) primary else Color.White
+                        tint = if (state.deviceAdminStatus) primary else Color.White
                     )
                 }
             )
         }
 
+        item {
+            SettingsSwitchItem(
+                title = "Lockdown Mode",
+                subTitle = "Disable biometrics and requires PIN or PATTERN to disarm",
+                switchValue = state.lockdownMode,
+                useIcon = true,
+                onSwitchValueChanges = { actions(SettingsEvent.ToggleLockdownMode(it)) },
+                iconScope = {
+                    Icon(
+                        modifier = Modifier
+                            .scale(.9f)
+                            .padding(end = 5.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_lock_shield),
+                        contentDescription = null,
+                        tint = if (state.lockdownMode) primary else Color.White
+                    )
+                }
+            )
+        }
 
     }
 }
@@ -138,5 +167,8 @@ fun SecuritySettingsScreen() {
 @Preview
 @Composable
 private fun SecuritySettingsScreenPreview() {
-    SecuritySettingsScreen()
+    SecuritySettingsInnerScreen(
+        state = SecuritySettingsState(),
+        actions = {}
+    )
 }
