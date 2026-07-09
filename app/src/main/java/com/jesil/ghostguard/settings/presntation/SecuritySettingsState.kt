@@ -4,7 +4,8 @@ data class SecuritySettingsState(
     // Detection Sensitivity
     val motionThreshold: Float = 0.8f,
     val motionThresholdLabel: String = "High",
-    val proximityDelaySec: Int = 3,
+    val proximityDelaySec: Float = 0.3f,
+    val proximityDelayLabel: String = "3s",
 
     // Alarm Preferences
     val flashlightStrobing: Boolean = false,

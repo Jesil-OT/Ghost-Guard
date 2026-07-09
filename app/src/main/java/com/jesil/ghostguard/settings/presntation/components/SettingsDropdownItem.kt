@@ -27,7 +27,6 @@ fun SettingsDropdownItem(
     modifier: Modifier = Modifier,
     title: String,
     dropdownItems: List<String>,
-    onDropdownClicked: () -> Unit,
     onDropdownItemSelected: (String) -> Unit
 ) {
     GlassmorphismCard(
@@ -63,6 +62,7 @@ fun DropdownItem(
 ) {
     GlassmorphismCard(
         size = 10.dp,
+        padding = 3.dp,
         modifier = modifier,
         content = {
             Row (
@@ -107,6 +107,5 @@ private fun SettingsDropdownItemPreview() {
         title = "Select Alarm Tone",
         dropdownItems = dropDownAlarmTone,
         onDropdownItemSelected = {},
-        onDropdownClicked = {}
     )
 }
