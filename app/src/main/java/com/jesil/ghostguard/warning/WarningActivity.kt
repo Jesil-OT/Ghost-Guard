@@ -81,7 +81,7 @@ class WarningActivity : FragmentActivity() {
                                 endY = 1000.0f
                             )
                         ).padding(innerPadding),
-                        countDownTimer = timerValue.toString(),
+                        countDownTimer = timerValue,
                         isTimerOver = isTimeOver,
                         onAuthenticate = {
                             BiometricsManager.authenticateWithBiometrics(

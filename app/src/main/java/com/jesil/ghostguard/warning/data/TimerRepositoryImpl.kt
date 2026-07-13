@@ -10,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class TimerRepositoryImpl : TimerRepository {
     private var timerJob: Job? = null
@@ -24,7 +25,7 @@ class TimerRepositoryImpl : TimerRepository {
         timerJob = scope.launch {
             for (i in 10 downTo 0) {
                 countDownFlow.value = i.toLong()
-                delay(1000)
+                delay(1000.milliseconds)
             }
             timerFinished(true)
         }
