@@ -57,9 +57,9 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            GhostGuardTheme {
+//            GhostGuardTheme {
                 AppContent()
-            }
+//            }
         }
     }
 

@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 class SensorMonitor(
     private val onMotionDetected: () -> Unit,
 ): SensorEventListener {
-    private val thresholdSlop = 1.8f       // Delta deviation from gravity (m/s^2)
+    var thresholdSlop: Float = 1.8f       // Delta deviation from gravity (m/s^2)
     private val sustainedWindowMs = 350L    // Continuous time movement must endure
 
     // --- State Tracking Variables ---

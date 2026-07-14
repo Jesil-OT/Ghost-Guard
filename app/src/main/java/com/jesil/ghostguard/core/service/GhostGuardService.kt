@@ -63,6 +63,7 @@ class GhostGuardService: Service() {
                 Log.e(TAG, "onCreate: Pocket Mode Enabled: $isEnabled")
                 sensorMonitor?.isPocketModeEnabled = isEnabled
             }
+            // collect threshold value
         }
 
         serviceScope.launch {

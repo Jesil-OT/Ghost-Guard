@@ -90,7 +90,7 @@ fun SecurityLogScreenInnerScreen(
         modifier = modifier
             .fillMaxSize()
             .background(background)
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 25.dp)
     ) {
         Text(
             modifier = Modifier.padding(bottom = 15.dp, top = 25.dp),
@@ -100,7 +100,7 @@ fun SecurityLogScreenInnerScreen(
             )
         )
         Text(
-            modifier = Modifier.padding(bottom = 20.dp),
+            modifier = Modifier.padding(bottom = 25.dp),
             text = "Review recent sensor activity and system events.",
             style = Typographys.bodySmall.copy(
                 color = Color.White,

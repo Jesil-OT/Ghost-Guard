@@ -9,8 +9,6 @@ interface SecurityLogRepository {
 
     fun getLogsByType(logType: List<LogEventType>): Flow<List<SecurityLog>>
 
-    suspend fun deleteLogById(logId: Int)
-
     suspend fun deleteAllLogs()
 
 }

@@ -23,7 +23,7 @@ class SettingsViewModel : ViewModel() {
                 _state.update {
                     it.copy(
                         motionThreshold = action.value,
-                        motionThresholdLabel = if (action.value < 0.5) "Low" else "High"
+                        motionThresholdLabel = if (action.value < 3f) "Low" else "High"
                     )
                 }
             }
