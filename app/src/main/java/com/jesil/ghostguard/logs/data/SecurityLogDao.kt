@@ -18,9 +18,6 @@ interface SecurityLogDao {
     @Query("SELECT * FROM security_logs WHERE log_type IN (:logType) ORDER BY timestamp DESC")
     fun getLogsByType(logType: List<LogEventType>): Flow<List<SecurityLogEntity>>
 
-    @Query("DELETE FROM security_logs WHERE id = :logId")
-    suspend fun deleteLogById(logId: Int)
-
     @Query("DELETE FROM security_logs")
     suspend fun deleteAllLogs()
 }

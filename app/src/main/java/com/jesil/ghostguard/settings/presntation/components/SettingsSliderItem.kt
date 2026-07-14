@@ -29,6 +29,7 @@ fun SettingsSliderItem(
     subTitle: String,
     sliderValue: Float,
     sliderValueLabel: String,
+    sliderSteps: Int,
     valueRange: ClosedFloatingPointRange<Float>,
     onSliderValueChange: (Float) -> Unit
 ) {
@@ -80,6 +81,7 @@ fun SettingsSliderItem(
                     value = sliderValue,
                     onValueChange = onSliderValueChange,
                     valueRange = valueRange,
+                    steps = sliderSteps,
                     colors = SliderDefaults.colors(
                         thumbColor = primary,
                         activeTrackColor = primary.copy(alpha = .4f),
@@ -98,9 +100,10 @@ private fun SettingsSliderItemPreview() {
         modifier = Modifier,
         title = "Motion Threshold",
         subTitle = "Adjust the sensitivity of motion detection.",
-        sliderValue = 0.8f,
+        sliderValue = 3f,
         sliderValueLabel = "High",
-        valueRange = 0f..1f,
+        valueRange = 1f..5f,
+        sliderSteps = 4,
         onSliderValueChange = {}
     )
 }
