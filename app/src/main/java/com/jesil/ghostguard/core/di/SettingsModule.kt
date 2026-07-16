@@ -3,7 +3,7 @@ package com.jesil.ghostguard.core.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.jesil.ghostguard.settings.data.SettingsRepositoryImpl
-import com.jesil.ghostguard.settings.domain.repository.SettingsRepository
+import com.jesil.ghostguard.settings.domain.SettingsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

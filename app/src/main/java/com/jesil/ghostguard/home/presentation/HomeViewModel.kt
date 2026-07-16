@@ -49,22 +49,8 @@ class HomeViewModel @Inject constructor(
                     motionDetectionRepository.setArmed(actions.isToggled)
                     toggleService(actions.isToggled)
                     when (actions.isToggled) {
-                        true -> securityLogRepository.addLog(
-                            SecurityLog(
-                                title = LogEventType.SYSTEM_ARMED.title(),
-                                description = LogEventType.SYSTEM_ARMED.description(),
-                                timeStamp = System.currentTimeMillis(),
-                                type = LogEventType.SYSTEM_ARMED,
-                            )
-                        )
-                        false -> securityLogRepository.addLog(
-                            SecurityLog(
-                                title = LogEventType.SYSTEM_DISARMED.title(),
-                                description = LogEventType.SYSTEM_DISARMED.description(),
-                                timeStamp = System.currentTimeMillis(),
-                                type = LogEventType.SYSTEM_DISARMED,
-                            )
-                        )
+                        true -> securityLogRepository.addLog(LogEventType.SYSTEM_ARMED)
+                        false -> securityLogRepository.addLog( LogEventType.SYSTEM_DISARMED)
                     }
                 }
             }
@@ -73,22 +59,8 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch {
                     pocketModeRepository.setPocketModeEnabled(actions.isToggled)
                     when (actions.isToggled) {
-                        true -> securityLogRepository.addLog(
-                            SecurityLog(
-                                title = LogEventType.POCKET_MODE_ARMED.title(),
-                                description = LogEventType.POCKET_MODE_ARMED.description(),
-                                timeStamp = System.currentTimeMillis(),
-                                type = LogEventType.POCKET_MODE_ARMED,
-                            )
-                        )
-                        false -> securityLogRepository.addLog(
-                            SecurityLog(
-                                title = LogEventType.POCKET_MODE_DISARMED.title(),
-                                description = LogEventType.POCKET_MODE_DISARMED.description(),
-                                timeStamp = System.currentTimeMillis(),
-                                type = LogEventType.POCKET_MODE_DISARMED,
-                            )
-                        )
+                        true -> securityLogRepository.addLog(LogEventType.POCKET_MODE_ARMED)
+                        false -> securityLogRepository.addLog(LogEventType.POCKET_MODE_DISARMED)
                     }
                 }
             }

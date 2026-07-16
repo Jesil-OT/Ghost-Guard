@@ -38,15 +38,18 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun CountDownTimer(
     modifier: Modifier = Modifier,
+    maxSeconds: Long,
     currentSeconds: Long,
     size: Dp = 200.dp,
     trackColor: Color = Color.Black.copy(alpha = .4f),
     strokeWidth: Dp = 12.dp,
+    updateMaxSeconds: (Long) -> Unit
 ) {
-    var maxSeconds by remember { mutableLongStateOf(10L) }
+//    var maxSeconds by remember { mutableLongStateOf(10L) }
     LaunchedEffect(currentSeconds) {
         if (currentSeconds > maxSeconds) {
-            maxSeconds = currentSeconds
+//            maxSeconds = currentSeconds
+            updateMaxSeconds(currentSeconds)
         }
     }
 
@@ -135,5 +138,7 @@ private fun CountDownTimerPreview() {
     CountDownTimer(
         modifier = Modifier,
         currentSeconds = 4L,
+        maxSeconds = 10L,
+        updateMaxSeconds = {}
     )
 }

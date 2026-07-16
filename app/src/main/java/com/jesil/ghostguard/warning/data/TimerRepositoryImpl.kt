@@ -1,35 +1,40 @@
 package com.jesil.ghostguard.warning.data
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import com.jesil.ghostguard.settings.domain.SettingsRepository
 import com.jesil.ghostguard.warning.domain.TimerRepository
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
 
 class TimerRepositoryImpl : TimerRepository {
     private var timerJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
     override val countDownFlow: MutableStateFlow<Long> = MutableStateFlow(0L)
     override val isTimerFinished: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    override fun startTimer()  {
+    override fun startTimer(durationSeconds: Int)  {
         cancelTimer()
         timerFinished(false)
+
         timerJob = scope.launch {
-            for (i in 10 downTo 0) {
+            for (i in durationSeconds downTo 0) {
                 countDownFlow.value = i.toLong()
                 delay(1000.milliseconds)
             }
             timerFinished(true)
         }
     }
+
     override fun cancelTimer() {
         timerJob?.cancel()
         timerJob = null
@@ -38,4 +43,5 @@ class TimerRepositoryImpl : TimerRepository {
     override fun timerFinished(value: Boolean) {
         isTimerFinished.value = value
     }
+
 }

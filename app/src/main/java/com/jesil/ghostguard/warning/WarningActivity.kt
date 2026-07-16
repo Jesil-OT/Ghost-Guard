@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,8 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.jesil.ghostguard.core.data.SecurityDataStore
-import com.jesil.ghostguard.core.data.SecurityRepository
-import com.jesil.ghostguard.core.data.SecurityState
 import com.jesil.ghostguard.core.service.ServiceActions
 import com.jesil.ghostguard.core.theme.background
 import com.jesil.ghostguard.core.theme.secondary
@@ -38,6 +35,12 @@ const val TAG = "WarningActivity"
 class WarningActivity : FragmentActivity() {
     @Inject lateinit var keyguardManager: KeyguardManager
     @Inject lateinit var securityDataStore: SecurityDataStore
+
+//    @Inject lateinit var settingsRepository: SettingsRepository
+//
+//    val totalSeconds = settingsRepository.getSecurityValues().map {
+//        it.proximityDelaySec
+//    }
     val biometricPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -70,6 +73,7 @@ class WarningActivity : FragmentActivity() {
 
             val timerValue by viewModel.countDownTimerValue.collectAsStateWithLifecycle()
             val isTimeOver by viewModel.triggerAlert.collectAsStateWithLifecycle()
+//            val seconds = totalSeconds.collectAsStateWithLifecycle(initialValue = 0f)
 
             Scaffold(
                 content = { innerPadding ->
@@ -83,6 +87,10 @@ class WarningActivity : FragmentActivity() {
                         ).padding(innerPadding),
                         countDownTimer = timerValue,
                         isTimerOver = isTimeOver,
+                        maxSeconds = 10L,
+                        onMaxSecondsUpdate = {
+
+                        },
                         onAuthenticate = {
                             BiometricsManager.authenticateWithBiometrics(
                                 context = this,
@@ -91,7 +99,7 @@ class WarningActivity : FragmentActivity() {
                                 },
                                 onAuthenticationSuccess = {
                                     viewModel.cancelTimer()
-                                    viewModel.launchSoundIntent(actions = ServiceActions.STOP_SOUND.toString())
+                                    viewModel.launchSoundIntent(ServiceActions.STOP_SOUND)
                                     finish()
                                 },
                                 onAuthenticationError = { _, _ -> }
