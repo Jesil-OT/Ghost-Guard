@@ -41,6 +41,8 @@ fun WarningScreen(
     modifier: Modifier = Modifier,
     countDownTimer: Long,
     isTimerOver: Boolean = false,
+    maxSeconds: Long,
+    onMaxSecondsUpdate: (Long) -> Unit,
     onAuthenticate: () -> Unit,
 ) {
     Box{
@@ -82,6 +84,8 @@ fun WarningScreen(
                     modifier = Modifier.padding(vertical = 15.dp)
                         .weight(1f),
                     currentSeconds = countDownTimer,
+                    maxSeconds = maxSeconds,
+                    updateMaxSeconds = onMaxSecondsUpdate
                 )
                 Text(
                     modifier = Modifier.padding(horizontal = 25.dp),
@@ -137,5 +141,7 @@ private fun WarningScreenPreview() {
             ),
         countDownTimer = 9,
         onAuthenticate = {},
+        maxSeconds = 10L,
+        onMaxSecondsUpdate = {}
     )
 }

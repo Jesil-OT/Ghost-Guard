@@ -44,7 +44,6 @@ class GhostGuardService: Service() {
     @Inject lateinit var securityRepository: SecurityRepository
     @Inject lateinit var securityDataStore: SecurityDataStore
     @Inject lateinit var pocketModeRepository: PocketModeRepository
-
     @Inject lateinit var logRepository: SecurityLogRepository
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -76,17 +75,13 @@ class GhostGuardService: Service() {
                         soundManager.stopSound()
                         launchWarningMode()
                         startWatchdog()
-                        logRepository.addLog(
-                            SecurityLog(
-                                title = LogEventType.WARNING_TRIGGERED.title(),
-                                description = LogEventType.WARNING_TRIGGERED.description(),
-                                timeStamp = System.currentTimeMillis(),
-                                type = LogEventType.WARNING_TRIGGERED
-                            )
-                        )
+                        logRepository.addLog(LogEventType.WARNING_TRIGGERED)
 
                     }
-                    SecurityState.ALARM -> soundManager.startSound()
+                    SecurityState.ALARM ->{
+                        soundManager.startSound()
+                        logRepository.addLog(LogEventType.ALARM_TRIGGERED)
+                    }
                 }
             }
         }

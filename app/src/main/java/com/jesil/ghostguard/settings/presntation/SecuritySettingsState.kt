@@ -3,9 +3,7 @@ package com.jesil.ghostguard.settings.presntation
 data class SecuritySettingsState(
     // Detection Sensitivity
     val motionThreshold: Float = 4f,
-    val motionThresholdLabel: String = "High",
-    val proximityDelaySec: Float = 3f,
-    val proximityDelayLabel: String = "3s",
+    val proximityDelaySec: Float = 10f,
 
     // Alarm Preferences
     val flashlightStrobing: Boolean = false,

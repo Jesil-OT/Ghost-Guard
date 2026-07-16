@@ -1,4 +1,4 @@
-package com.jesil.ghostguard.settings.domain.repository
+package com.jesil.ghostguard.settings.domain
 
 data class SettingsValue(
     val threshold: Float,

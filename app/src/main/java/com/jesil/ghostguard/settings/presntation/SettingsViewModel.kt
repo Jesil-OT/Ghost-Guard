@@ -2,73 +2,86 @@ package com.jesil.ghostguard.settings.presntation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.jesil.ghostguard.settings.domain.SettingsRepository
+import com.jesil.ghostguard.settings.presntation.mapper.toSettingsValue
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class SettingsViewModel : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val settingsRepository: SettingsRepository
+): ViewModel() {
 
-    private val _state = MutableStateFlow(SecuritySettingsState())
-    val state = _state.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = SecuritySettingsState()
-    )
+    companion object {
+        const val THRESHOLD_SENSITIVITY = 5.5f
+    }
+
+    val state = settingsRepository.getSecurityValues()
+        .map {
+            SecuritySettingsState(
+                motionThreshold = it.threshold,
+                proximityDelaySec = it.proximityDelaySec,
+                flashlightStrobing = it.flashlightStrobing,
+                maxVolumeOverride = it.maxVolumeOverride,
+                alarmTone = it.alarmTone,
+                deviceAdminStatus = it.deviceAdminStatus,
+                lockdownMode = it.lockdownMode
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = SecuritySettingsState()
+        )
 
 
     fun onAction(action: SettingsEvent) {
         when (action) {
             is SettingsEvent.UpdateMotionThreshold -> {
-                _state.update {
-                    it.copy(
-                        motionThreshold = action.value,
-                        motionThresholdLabel = if (action.value < 3f) "Low" else "High"
-                    )
+                viewModelScope.launch {
+//                    val threshold = THRESHOLD_SENSITIVITY - action.value
+                    settingsRepository.updateThreshold(action.value)
                 }
             }
 
             is SettingsEvent.UpdateProximityDelay -> {
-                _state.update {
-                    it.copy(
-                        proximityDelaySec = action.seconds,
-                        proximityDelayLabel = action.seconds.proximityDelayLabel()
-                    )
+                viewModelScope.launch {
+                    settingsRepository.updateProximityDelay(action.seconds)
                 }
             }
 
             is SettingsEvent.ToggleFlashlight -> {
-                _state.update { it.copy(flashlightStrobing = action.enabled) }
+                viewModelScope.launch {
+                    settingsRepository.updateFlashlight(action.enabled)
+                }
             }
 
             is SettingsEvent.ToggleMaxOverride -> {
-                _state.update { it.copy(maxVolumeOverride = action.enabled) }
+                viewModelScope.launch {
+                    settingsRepository.updateMaxVolumeOverride(action.enabled)
+                }
             }
 
             is SettingsEvent.UpdateAlarmTone -> {
-                _state.update { it.copy(alarmTone = action.tone) }
+                viewModelScope.launch {
+                    settingsRepository.updateAlarmTone(action.tone)
+                }
             }
 
             is SettingsEvent.ToggleDeviceAdminStatus -> {
-                _state.update { it.copy(deviceAdminStatus = action.enabled) }
+                viewModelScope.launch {
+                    settingsRepository.updateDeviceAdminStatus(action.enabled)
+                }
             }
 
             is SettingsEvent.ToggleLockdownMode -> {
-                _state.update { it.copy(lockdownMode = action.enabled) }
+                viewModelScope.launch {
+                    settingsRepository.updateLockdownMode(action.enabled)
+                }
             }
         }
     }
-
-    private fun Float.proximityDelayLabel(): String =
-        when (this) {
-            0.1f -> "1s"
-            0.2f -> "2s"
-            0.3f -> "3s"
-            0.4f -> "4s"
-            0.5f -> "5s"
-            0.6f -> "6s"
-            0.7f -> "7s"
-            0.8f -> "8s"
-            else -> "9s"
-        }
 }

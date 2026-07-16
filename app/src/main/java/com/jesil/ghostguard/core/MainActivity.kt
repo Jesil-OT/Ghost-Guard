@@ -57,9 +57,9 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-//            GhostGuardTheme {
+            GhostGuardTheme {
                 AppContent()
-//            }
+            }
         }
     }
 
@@ -74,8 +74,8 @@ class MainActivity : ComponentActivity() {
 
         Scaffold(
             modifier = Modifier
-                .background(background)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(background),
             topBar = {
                 GhostGuardToolbar(
                     currentScreen = currentRoute,

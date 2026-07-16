@@ -70,9 +70,9 @@ fun SecuritySettingsInnerScreen(
                 title = "Motion Threshold",
                 subTitle = "Adjust the sensitivity of motion detection.",
                 sliderValue = state.motionThreshold,
-                sliderValueLabel = state.motionThresholdLabel,
-                valueRange = 1f..5f,
-                sliderSteps = 4,
+                sliderValueLabel = if (state.motionThreshold < 5f) "Low" else "High",
+                valueRange = 1f..10f,
+                sliderSteps = 9,
                 onSliderValueChange = { actions(SettingsEvent.UpdateMotionThreshold(it)) }
             )
         }
@@ -82,9 +82,9 @@ fun SecuritySettingsInnerScreen(
                 title = "Proximity Delay",
                 subTitle = "Time before triggering alarm upon detection.",
                 sliderValue = state.proximityDelaySec,
-                sliderValueLabel = state.proximityDelayLabel,
-                valueRange = 1f..9f,
-                sliderSteps = 9,
+                sliderValueLabel = "${state.proximityDelaySec.toInt()}s",
+                valueRange = 1f..20f,
+                sliderSteps = 19,
                 onSliderValueChange = { actions(SettingsEvent.UpdateProximityDelay(it)) }
             )
         }
