@@ -10,11 +10,12 @@
 ---
 
 ## 📸 Visuals
-<img src="assets/screen_recording_01.gif" width="300" alt="Ghostguard Demo Home screen">
-<img src="assets/screen_recording_02.gif" width="300" alt="Ghostguard Demo Log screen">
-<img src="assets/screen_recording_03.gif" width="300" alt="Ghostguard Demo settings screen">
-<img src="assets/screen_recording_04.gif" width="300" alt="Ghostguard Demo warning and alert screen">
-
+<p align="left">
+  <img src="assets/screen_recording_01.gif" width="300" alt="Ghostguard Demo Home screen">
+  <img src="assets/screen_recording_02.gif" width="300" alt="Ghostguard Demo Log screen">
+  <img src="assets/screen_recording_03.gif" width="300" alt="Ghostguard Demo settings screen">
+  <img src="assets/screen_recording_04.gif" width="300" alt="Ghostguard Demo warning and alert screen">
+</p>
 ---
 
 ## ✨ Features
