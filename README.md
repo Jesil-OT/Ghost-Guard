@@ -8,8 +8,13 @@
 **Ghostguard** is a lightweight, reliable security application built to protect your device 24/7 from phone snatchers and parents who just snatch their kids' phone. By leveraging the device's built-in accelerometer and proximity sensors, Ghostguard detects unauthorized movement or handling and instantly triggers security alerts.
 
 ---
+
 ## 📸 Visuals
-![Ghostguard Demo](assets/screen_recording_01.gif)
+<img src="assets/screen_recording_01.gif" width="300" alt="Ghostguard Demo Home screen">
+<img src="assets/screen_recording_02.gif" width="300" alt="Ghostguard Demo Log screen">
+<img src="assets/screen_recording_03.gif" width="300" alt="Ghostguard Demo settings screen">
+<img src="assets/screen_recording_04.gif" width="300" alt="Ghostguard Demo warning and alert screen">
+
 ---
 
 ## ✨ Features
