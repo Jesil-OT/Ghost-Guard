@@ -85,7 +85,9 @@ fun SettingsSliderItem(
                     colors = SliderDefaults.colors(
                         thumbColor = primary,
                         activeTrackColor = primary.copy(alpha = .4f),
-                        inactiveTrackColor = Color.White.copy(alpha = 0.2f)
+                        inactiveTrackColor = Color.White.copy(alpha = 0.2f),
+                        inactiveTickColor = Color.White.copy(alpha = 0.2f),
+
                     )
                 )
             }
@@ -102,8 +104,8 @@ private fun SettingsSliderItemPreview() {
         subTitle = "Adjust the sensitivity of motion detection.",
         sliderValue = 3f,
         sliderValueLabel = "High",
-        valueRange = 1f..5f,
-        sliderSteps = 4,
+        valueRange = 1f..20f,
+        sliderSteps = 19,
         onSliderValueChange = {}
     )
 }
