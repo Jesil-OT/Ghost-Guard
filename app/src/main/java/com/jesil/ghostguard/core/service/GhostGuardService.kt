@@ -23,6 +23,7 @@ import com.jesil.ghostguard.logs.domain.SecurityLogRepository
 import com.jesil.ghostguard.logs.presentation.model.LogEventType
 import com.jesil.ghostguard.logs.presentation.model.description
 import com.jesil.ghostguard.logs.presentation.model.title
+import com.jesil.ghostguard.settings.domain.FlashlightStrobing
 import com.jesil.ghostguard.warning.WarningActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +46,8 @@ class GhostGuardService: Service() {
     @Inject lateinit var securityDataStore: SecurityDataStore
     @Inject lateinit var pocketModeRepository: PocketModeRepository
     @Inject lateinit var logRepository: SecurityLogRepository
+
+    @Inject lateinit var flashlightStrobing: FlashlightStrobing
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
@@ -70,17 +73,20 @@ class GhostGuardService: Service() {
                 when (state) {
                     SecurityState.IDLE, SecurityState.ARMED-> {
                        soundManager.stopSound()
+                        flashlightStrobing.stopStrobeLight()
                     }
                     SecurityState.WARNING -> {
                         soundManager.stopSound()
                         launchWarningMode()
                         startWatchdog()
+                        flashlightStrobing.stopStrobeLight()
                         logRepository.addLog(LogEventType.WARNING_TRIGGERED)
 
                     }
                     SecurityState.ALARM ->{
                         soundManager.startSound()
                         logRepository.addLog(LogEventType.ALARM_TRIGGERED)
+                        flashlightStrobing.startStrobeLightIfNeeded()
                     }
                 }
             }
