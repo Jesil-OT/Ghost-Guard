@@ -61,8 +61,6 @@ $$\Delta = | |A| - 9.81 |$$
 
 ## 🛠️ Tech Stack
 
-## 🛠️ Tech Stack
-
 * **Language:** [Kotlin](https://kotlinlang.org/)
 * **UI Framework:** Jetpack Compose
 * **Architecture:** Clean Architecture & MVVM (Model-View-ViewModel)
@@ -75,3 +73,7 @@ $$\Delta = | |A| - 9.81 |$$
 ## 📄 License
 
 This project is open-source and available under the [MIT License](LICENSE).
+
+## 🚧 Status & Ongoing Development
+
+> **Please Note:** This project is currently under active development as a work-in-progress (WIP). You may encounter occasional bugs, edge-case issues, or unfinished features as the codebase is continuously refined, refactored, and tested.
